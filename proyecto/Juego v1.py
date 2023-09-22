@@ -23,3 +23,5 @@ while run:
 
 
 pygame.quit()
+
+paco = 1 
