@@ -8,8 +8,6 @@ screen_height = 600
 pantalla = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Hola")
 
-pygame.draw.rect(pantalla, ROJO, (100, 100, 100, 50))
-
 run = True
 while run:
     pantalla.fill((5, 130, 250))
