@@ -26,9 +26,9 @@ font = pygame.font.SysFont("arialblack", 40)
 
 color_text = (255, 255, 255)
 
-play_img = pygame.image.load('proyecto/boton_play.png').convert_alpha()
+jugar_img = pygame.image.load('proyecto/sprites/JUGAR1.png').convert_alpha()
 
-play_btn = Boton(450, 200, play_img, 0.18)
+jugar_btn = Boton(450, 200, jugar_img, 0.18)
 
 
 
@@ -42,7 +42,7 @@ while run:
     pantalla.fill((202, 228, 241))
 
     if juego_inicio == True:
-        play_btn.draw()
+        jugar_btn.draw()
     else:
         draw_text("Pulsa Espacio para Comenzar", font, color_text, 70, 250)
 
