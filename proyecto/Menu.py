@@ -1,8 +1,8 @@
 import pygame, random
 
 pygame.init()
-screen_width = 800
-screen_height = 600
+screen_width = 1200
+screen_height = 900
 
 pantalla = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Menu")
@@ -28,7 +28,7 @@ color_text = (255, 255, 255)
 
 jugar_img = pygame.image.load('proyecto/sprites/JUGAR1.png').convert_alpha()
 
-jugar_btn = Boton(450, 200, jugar_img, 3.5)
+jugar_btn = Boton(451, 291, jugar_img, 5.25)
 
 
 def draw_text(text, font, text_col, x, y):
