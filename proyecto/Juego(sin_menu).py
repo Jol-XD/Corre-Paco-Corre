@@ -1,6 +1,5 @@
 import random
 import time
-
 import pygame
 
 ROJO = (255, 0, 0)
