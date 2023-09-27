@@ -28,7 +28,7 @@ color_text = (255, 255, 255)
 
 jugar_img = pygame.image.load('proyecto/sprites/JUGAR1.png').convert_alpha()
 
-jugar_btn = Boton(450, 200, jugar_img, 1)
+jugar_btn = Boton(450, 200, jugar_img, 5)
 
 
 
