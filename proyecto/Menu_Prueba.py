@@ -22,7 +22,7 @@ class Boton():
         pantalla.blit(self.image, (self.rect.x, self.rect.y))
 
 def cambiar_a_juego():
-    os.system("python proyecto/Juego.py")
+    os.system("proyecto/Juego.py")
 
 def salir_del_juego():
     pygame.quit()
