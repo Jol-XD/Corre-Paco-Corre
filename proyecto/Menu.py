@@ -20,7 +20,6 @@ class Boton():
     def draw(self):
         pantalla.blit(self.image, (self.rect.x, self.rect.y))
 
-juego_inicio = False
 
 font = pygame.font.SysFont("arialblack", 40)
 
@@ -28,7 +27,7 @@ color_text = (255, 255, 255)
 
 jugar_img = pygame.image.load('proyecto/sprites/JUGAR1.png').convert_alpha()
 
-jugar_btn = Boton(451, 291, jugar_img, 5.25)
+jugar_btn = Boton(425, 291, jugar_img, 5.25)
 
 
 def draw_text(text, font, text_col, x, y):
@@ -39,17 +38,10 @@ run = True
 while run:
 
     pantalla.fill((202, 228, 241))
-
-    if juego_inicio == True:
-        jugar_btn.draw()
-    else:
-        draw_text("Pulsa Espacio para Comenzar", font, color_text, 70, 250)
+    jugar_btn.draw()
 
 
     for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                juego_inicio = True
         if event.type == pygame.QUIT:
             run = False
 
