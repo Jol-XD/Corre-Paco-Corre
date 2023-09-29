@@ -1,4 +1,5 @@
 import pygame
+import os
 
 pygame.init()
 screen_width = 1200
@@ -18,6 +19,9 @@ class Boton():
 
     def draw(self):
         pantalla.blit(self.image, (self.rect.x, self.rect.y))
+
+def cambiar_a_juego():
+    os.system("python proyecto/Juego.py")
 
 jugar_img = pygame.image.load('proyecto/sprites/JUGAR1.png').convert_alpha()
 jugar_presionado_img = pygame.image.load('proyecto/sprites/jugar02.png').convert_alpha()
@@ -41,7 +45,9 @@ while run:
             if jugar_btn.rect.collidepoint(event.pos):
                 jugar_btn.clicked = True
         if event.type == pygame.MOUSEBUTTONUP:
-            jugar_btn.clicked = False
+            if jugar_btn.clicked:
+                jugar_btn.clicked = False
+                cambiar_a_juego()
 
     if jugar_btn.clicked:
         jugar_btn.image = pygame.transform.scale(jugar_presionado_img, (int(jugar_img.get_width() * 5.25), int(jugar_img.get_height() * 5.25)))
