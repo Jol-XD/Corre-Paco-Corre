@@ -38,6 +38,7 @@ Si_img = pygame.image.load('proyecto/sprites/si.png').convert_alpha()
 jugar_btn = Boton(445, 391, jugar_img, 5.25)
 salir_btn = Boton(446, 525, salir_img, 5.25)
 
+
 def mostrar_mensaje_salida():
     pantalla.fill((202, 228, 241))
 
@@ -47,6 +48,7 @@ def mostrar_mensaje_salida():
 
     yes_btn = Boton(300, 400, Si_img, 2)
     no_btn = Boton(600, 400, No_img, 2)
+
 
     while True:
         for event in pygame.event.get():
@@ -70,7 +72,8 @@ while run:
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            run = False
+            if mostrar_mensaje_salida():
+                run = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             if jugar_btn.rect.collidepoint(event.pos):
                 jugar_btn.clicked = True
