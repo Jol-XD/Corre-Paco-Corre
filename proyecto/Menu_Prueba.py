@@ -37,16 +37,16 @@ Si_img = pygame.image.load('proyecto/sprites/si.png').convert_alpha()
 
 jugar_btn = Boton(445, 391, jugar_img, 5.25)
 salir_btn = Boton(446, 525, salir_img, 5.25)
+yes_btn = Boton(350, 400, Si_img, 2)
+no_btn = Boton(600, 400, No_img, 2)
 
 def mostrar_mensaje_salida():
     pantalla.fill((202, 228, 241))
 
     mensaje = "¿Deseas salir del juego?"
     font = pygame.font.SysFont("arialblack", 40)
-    draw_text(mensaje, font, (255, 255, 255), 325, 200)
+    draw_text(mensaje, font, (255, 255, 255), 325, 300)
 
-    yes_btn = Boton(300, 400, Si_img, 2)
-    no_btn = Boton(600, 400, No_img, 2)
 
     while True:
         for event in pygame.event.get():
