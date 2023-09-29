@@ -32,9 +32,32 @@ jugar_img = pygame.image.load('proyecto/sprites/JUGAR1.png').convert_alpha()
 jugar_presionado_img = pygame.image.load('proyecto/sprites/jugar02.png').convert_alpha()
 salir_img = pygame.image.load('proyecto/sprites/SALIR1.png').convert_alpha()
 salir_presionado_img = pygame.image.load('proyecto/sprites/boton_play.png').convert_alpha()
+No_img = pygame.image.load('proyecto/sprites/X.png').convert_alpha()
+Si_img = pygame.image.load('proyecto/sprites/si.png').convert_alpha()
 
 jugar_btn = Boton(445, 391, jugar_img, 5.25)
 salir_btn = Boton(446, 525, salir_img, 5.25)
+yes_btn = Boton(350, 400, Si_img, 2)
+no_btn = Boton(600, 400, No_img, 2)
+
+def mostrar_mensaje_salida():
+    pantalla.fill((202, 228, 241))
+    mensaje = "¿Enserio deseas salir del juego?"
+    font = pygame.font.SysFont("arialblack", 40)
+    draw_text(mensaje, font, (255, 255, 255), 325, 300)
+
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if yes_btn.rect.collidepoint(event.pos):
+                    return True
+                elif no_btn.rect.collidepoint(event.pos):
+                    return False
+
+        yes_btn.draw()
+        no_btn.draw()
+        pygame.display.update()
 
 def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
@@ -58,7 +81,8 @@ while run:
                 cambiar_a_juego()
             if salir_btn.clicked:
                 salir_btn.clicked = False
-                salir_del_juego()
+                if mostrar_mensaje_salida():
+                    run = False
 
     if jugar_btn.clicked:
         jugar_btn.image = pygame.transform.scale(jugar_presionado_img, (int(jugar_img.get_width() * 5.25), int(jugar_img.get_height() * 5.25)))

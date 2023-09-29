@@ -42,7 +42,7 @@ no_btn = Boton(600, 400, No_img, 2)
 
 def mostrar_mensaje_salida():
     pantalla.fill((202, 228, 241))
-    mensaje = "¿Deseas salir del juego?"
+    mensaje = "¿Enserio deseas salir del juego?"
     font = pygame.font.SysFont("arialblack", 40)
     draw_text(mensaje, font, (255, 255, 255), 325, 300)
 
