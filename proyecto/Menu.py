@@ -31,7 +31,7 @@ def salir_del_juego():
 jugar_img = pygame.image.load('proyecto/sprites/JUGAR1.png').convert_alpha()
 jugar_presionado_img = pygame.image.load('proyecto/sprites/jugar02.png').convert_alpha()
 salir_img = pygame.image.load('proyecto/sprites/SALIR1.png').convert_alpha()
-salir_presionado_img = pygame.image.load('proyecto/sprites/boton_play.png').convert_alpha()
+salir_presionado_img = pygame.image.load('proyecto/sprites/salir002.png').convert_alpha()
 No_img = pygame.image.load('proyecto/sprites/X.png').convert_alpha()
 Si_img = pygame.image.load('proyecto/sprites/si.png').convert_alpha()
 
