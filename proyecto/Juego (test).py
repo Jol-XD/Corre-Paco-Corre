@@ -20,11 +20,11 @@ class Jugador(pygame.sprite.Sprite):
 
         self.velocity[1] += self.gravity
 
-        
+        if self.velocity[1] > 3.5:  
+            self.velocity[1] = 3.5
 
         if not self.is_jumping:
             self.velocity[1] += self.gravity
-
 
         if self.position[1] >= 600 - 10:
             self.is_jumping = False 
