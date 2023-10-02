@@ -22,7 +22,7 @@ class Boton():
         pantalla.blit(self.image, (self.rect.x, self.rect.y))
 
 def cambiar_a_juego():
-    os.system("python proyecto/Juego.py")
+    os.system("proyecto/Juego.py")
 
 def salir_del_juego():
     pygame.quit()
@@ -32,7 +32,11 @@ jugar_img = pygame.image.load('proyecto/sprites/JUGAR1.png').convert_alpha()
 jugar_presionado_img = pygame.image.load('proyecto/sprites/jugar02.png').convert_alpha()
 salir_img = pygame.image.load('proyecto/sprites/SALIR1.png').convert_alpha()
 salir_presionado_img = pygame.image.load('proyecto/sprites/salir002.png').convert_alpha()
+<<<<<<< HEAD
 No_img = pygame.image.load('proyecto/sprites/no.png').convert_alpha()
+=======
+No_img = pygame.image.load('proyecto/sprites/X.png').convert_alpha()
+>>>>>>> 8a0925e64d8f304e86eb3e1ab7138db605fc56a3
 Si_img = pygame.image.load('proyecto/sprites/si.png').convert_alpha()
 
 jugar_btn = Boton(445, 391, jugar_img, 5.25)
