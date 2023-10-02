@@ -22,7 +22,7 @@ class Boton():
         pantalla.blit(self.image, (self.rect.x, self.rect.y))
 
 def cambiar_a_juego():
-    os.system("proyecto/Juego.py")
+    os.system("python proyecto/Juego.py")
 
 def salir_del_juego():
     pygame.quit()
@@ -32,23 +32,19 @@ jugar_img = pygame.image.load('proyecto/sprites/JUGAR1.png').convert_alpha()
 jugar_presionado_img = pygame.image.load('proyecto/sprites/jugar02.png').convert_alpha()
 salir_img = pygame.image.load('proyecto/sprites/SALIR1.png').convert_alpha()
 salir_presionado_img = pygame.image.load('proyecto/sprites/salir002.png').convert_alpha()
-<<<<<<< HEAD
 No_img = pygame.image.load('proyecto/sprites/no.png').convert_alpha()
-=======
-No_img = pygame.image.load('proyecto/sprites/X.png').convert_alpha()
->>>>>>> 8a0925e64d8f304e86eb3e1ab7138db605fc56a3
 Si_img = pygame.image.load('proyecto/sprites/si.png').convert_alpha()
 
 jugar_btn = Boton(445, 391, jugar_img, 5.25)
 salir_btn = Boton(446, 525, salir_img, 5.25)
-yes_btn = Boton(350, 400, Si_img, 2)
-no_btn = Boton(600, 400, No_img, 2)
+yes_btn = Boton(350, 400, Si_img, 5.25)
+no_btn = Boton(675, 400, No_img, 5.25)
 
 def mostrar_mensaje_salida():
     pantalla.fill((202, 228, 241))
     mensaje = "¿Enserio deseas salir del juego?"
-    font = pygame.font.SysFont("arialblack", 40)
-    draw_text(mensaje, font, (255, 255, 255), 325, 300)
+    font = pygame.font.SysFont("arialblack", 60)
+    draw_text(mensaje, font, (255, 255, 255), 290, 300)
 
 
     while True:
