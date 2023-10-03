@@ -6,9 +6,11 @@ ROJO = (255, 0, 0)
 FONDO = (5, 130, 250)
 
 class Jugador(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height, velocity_x, velocity_y):
+    def __init__(self, x, y, image_path, velocity_x, velocity_y):
         super().__init__()
-        self.rect = pygame.Rect(x, y, width, height)
+        self.image = pygame.image.load(image_path)
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
         self.velocity = [velocity_x, velocity_y]
         self.is_jumping = False
         self.is_agachado = False
@@ -51,18 +53,19 @@ class Jugador(pygame.sprite.Sprite):
         if self.is_agachado:
             self.is_agachado = False
             self.rect.height = 80
-            self.rect.y -= 0 
-
+            self.rect.y -= 50  # Ajusta la posición al levantarse
 
     def draw(self, surface):
-        pygame.draw.rect(surface, ROJO, self.rect)
+        surface.blit(self.image, self.rect)
 
 pygame.init()
 screen_width = 1200
 screen_height = 900
 pantalla = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("¡Corre Paco corre!")
-jugador = Jugador(320, 240, 40, 80, 0, 0)
+
+# Cambia la ruta de la imagen a la ubicación real de tu imagen del jugador
+jugador = Jugador(320, 240, "proyecto/sprites/pibe_palo.png", 0, 0)
 
 run = True
 
