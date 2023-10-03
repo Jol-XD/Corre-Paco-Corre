@@ -6,57 +6,67 @@ ROJO = (255, 0, 0)
 FONDO = (5, 130, 250)
 
 class Jugador(pygame.sprite.Sprite):
-    def __init__(self, x, y, velocity_x, velocity_y):
+    def __init__(self, x, y, width, height, velocity_x, velocity_y):
         super().__init__()
-        self.position = [x, y]
+        self.rect = pygame.Rect(x, y, width, height)
         self.velocity = [velocity_x, velocity_y]
         self.is_jumping = False
-        self.jump_strength = -10
+        self.is_agachado = False
         self.gravity = 0.33
-        
+        self.jump_strength = -10
+
     def update(self):
-        self.position[0] += self.velocity[0]
-        self.position[1] += self.velocity[1]
+        self.rect.x += self.velocity[0]
+        self.rect.y += self.velocity[1]
 
         self.velocity[1] += self.gravity
 
-        if self.velocity[1] > 3.5:  
+        if self.velocity[1] > 3.5:
             self.velocity[1] = 3.5
 
         if not self.is_jumping:
             self.velocity[1] += self.gravity
 
-        if self.position[1] >= 600 - 10:
-            self.is_jumping = False 
-            self.position[1] = 600 - 10
-            self.velocity[1] = 0
+        if self.rect.y >= 700:
+            self.is_jumping = False
+            if not self.is_agachado:
+                self.rect.y = 700
+                self.velocity[1] = 0
+            else:
+                self.rect.y = 750
+                self.velocity[1] = 0
 
     def salto(self):
         if not self.is_jumping:
             self.is_jumping = True
             self.velocity[1] = self.jump_strength
-    
+
+    def agacharse(self):
+        if not self.is_agachado:
+            self.is_agachado = True
+            self.rect.height = 40
+            self.rect.y = self.rect.y + 50
+
+    def levantarse(self):
+        if self.is_agachado:
+            self.is_agachado = False
+            self.rect.height = 80
+            self.rect.y -= 0 
+
+
     def draw(self, surface):
-        pygame.draw.circle(surface, (255, 0, 0), (int(self.position[0]), int(self.position[1])), 10)
-        
-        
+        pygame.draw.rect(surface, ROJO, self.rect)
+
 pygame.init()
 screen_width = 1200
 screen_height = 900
 pantalla = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("¡Corre Paco corre!")
-jugador = Jugador(320, 240, 0, 0)
+jugador = Jugador(320, 240, 40, 80, 0, 0)
 
 run = True
 
 while run:
-    pantalla.fill(FONDO)
-    pygame.draw.rect(pantalla, (28, 133, 45), (0, 500, 800, 200))
-    
-    pygame.draw.rect(pantalla, ROJO, (250, 300, 100, 200))
-
-    
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -65,15 +75,21 @@ while run:
             if event.key == pygame.K_UP:
                 jugador.salto()
                 print("salto")
-                
-        
+            if event.key == pygame.K_DOWN:
+                jugador.agacharse()
+                print("agachado")
+
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_DOWN:
+                jugador.levantarse()
+                print("levantado")
+
     jugador.update()
 
     pantalla.fill(FONDO)
 
     jugador.draw(pantalla)
-                
+
     pygame.display.update()
-    
 
 pygame.quit()
