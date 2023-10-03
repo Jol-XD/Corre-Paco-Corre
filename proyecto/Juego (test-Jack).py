@@ -10,19 +10,19 @@ class Jugador(pygame.sprite.Sprite):
         super().__init__()
         self.velocity = [velocity_x, velocity_y]
         self.is_jumping = False
-        self.is_agachado = False  
+        self.is_agachado = False
+        self.is_atacando = False 
         self.gravity = 0.33
         self.jump_strength = -10
 
         # Imágenes del jugador
         self.image_stand = pygame.image.load("proyecto/sprites/pibe_palo.png")
         self.image_crouch = pygame.image.load("proyecto/sprites/palo_agacha.png")
-
-        # Escalar las imágenes según el tamaño del rectángulo
+        
         self.image_stand = pygame.transform.scale(self.image_stand, (40, 80))
         self.image_crouch = pygame.transform.scale(self.image_crouch, (40, 40))
 
-        self.image = self.image_stand 
+        self.image = self.image_stand
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -58,17 +58,36 @@ class Jugador(pygame.sprite.Sprite):
             self.is_agachado = True
             self.image = self.image_crouch
             self.rect.height = 40
-            self.rect.y += 40  
+            self.rect.y += 0
 
     def levantarse(self):
         if self.is_agachado:
             self.is_agachado = False
             self.image = self.image_stand
             self.rect.height = 80
-            self.rect.y -= 40
+            self.rect.y -= 0
+
+    def atacar(self):
+        self.is_atacando = True
+
+    def detener_ataque(self):
+        self.is_atacando = False
 
     def draw(self, surface):
         surface.blit(self.image, self.rect.topleft)
+
+class Enemigo(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((40, 40))
+        self.image.fill(ROJO)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def update(self):
+        self.rect.x -= 2  # Mover al enemigo hacia la izquierda
+
 
 pygame.init()
 screen_width = 1200
@@ -76,6 +95,8 @@ screen_height = 900
 pantalla = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("¡Corre Paco corre!")
 jugador = Jugador(320, 240, 0, 0)
+
+enemigo = None  # Inicializar sin enemigo
 
 run = True
 
@@ -91,17 +112,34 @@ while run:
             if event.key == pygame.K_DOWN:
                 jugador.agacharse()
                 print("agachado")
+            if event.key == pygame.K_SPACE:
+                jugador.atacar()  
+                print("ataque")
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_DOWN:
                 jugador.levantarse()
                 print("levantado")
+            if event.key == pygame.K_SPACE:
+                jugador.detener_ataque() 
+
+    # Verificar si el jugador ataca y colisiona con el enemigo
+    if jugador.is_atacando and enemigo and jugador.rect.colliderect(enemigo.rect):
+        print("¡Enemigo eliminado!")
+        enemigo = None  # Eliminar al enemigo
 
     jugador.update()
 
     pantalla.fill(FONDO)
 
     jugador.draw(pantalla)
+
+    if not enemigo:
+        enemigo = Enemigo(screen_width, random.randint(100, 700))
+
+    if enemigo:
+        enemigo.update()
+        pantalla.blit(enemigo.image, enemigo.rect.topleft)
 
     pygame.display.update()
 

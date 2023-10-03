@@ -10,19 +10,19 @@ class Jugador(pygame.sprite.Sprite):
         super().__init__()
         self.velocity = [velocity_x, velocity_y]
         self.is_jumping = False
-        self.is_agachado = False  
+        self.is_agachado = False
+        self.is_atacando = False 
         self.gravity = 0.33
         self.jump_strength = -10
 
         # Imágenes del jugador
         self.image_stand = pygame.image.load("proyecto/sprites/pibe_palo.png")
         self.image_crouch = pygame.image.load("proyecto/sprites/palo_agacha.png")
-
-        # Escalar las imágenes según el tamaño del rectángulo
+        
         self.image_stand = pygame.transform.scale(self.image_stand, (40, 80))
         self.image_crouch = pygame.transform.scale(self.image_crouch, (40, 40))
 
-        self.image = self.image_stand 
+        self.image = self.image_stand
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -67,8 +67,18 @@ class Jugador(pygame.sprite.Sprite):
             self.rect.height = 80
             self.rect.y -= 0
 
+    def atacar(self):
+        self.is_atacando = True
+
+    def detener_ataque(self):
+        self.is_atacando = False
+
     def draw(self, surface):
         surface.blit(self.image, self.rect.topleft)
+
+        if self.is_atacando:
+
+            pygame.draw.rect(surface, ROJO, (self.rect.x + 40, self.rect.y + 30, 40, 15))
 
 pygame.init()
 screen_width = 1200
@@ -91,11 +101,16 @@ while run:
             if event.key == pygame.K_DOWN:
                 jugador.agacharse()
                 print("agachado")
+            if event.key == pygame.K_SPACE:
+                jugador.atacar()  
+                print("ataque")
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_DOWN:
                 jugador.levantarse()
                 print("levantado")
+            if event.key == pygame.K_SPACE:
+                jugador.detener_ataque() 
 
     jugador.update()
 
