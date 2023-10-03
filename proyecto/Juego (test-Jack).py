@@ -76,9 +76,18 @@ class Jugador(pygame.sprite.Sprite):
     def draw(self, surface):
         surface.blit(self.image, self.rect.topleft)
 
-        if self.is_atacando:
+class Enemigo(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((40, 40))
+        self.image.fill(ROJO)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
-            pygame.draw.rect(surface, ROJO, (self.rect.x + 40, self.rect.y + 30, 40, 15))
+    def update(self):
+        self.rect.x -= 2  # Mover al enemigo hacia la izquierda
+
 
 pygame.init()
 screen_width = 1200
@@ -86,6 +95,8 @@ screen_height = 900
 pantalla = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("¡Corre Paco corre!")
 jugador = Jugador(320, 240, 0, 0)
+
+enemigo = None  # Inicializar sin enemigo
 
 run = True
 
@@ -112,11 +123,23 @@ while run:
             if event.key == pygame.K_SPACE:
                 jugador.detener_ataque() 
 
+    # Verificar si el jugador ataca y colisiona con el enemigo
+    if jugador.is_atacando and enemigo and jugador.rect.colliderect(enemigo.rect):
+        print("¡Enemigo eliminado!")
+        enemigo = None  # Eliminar al enemigo
+
     jugador.update()
 
     pantalla.fill(FONDO)
 
     jugador.draw(pantalla)
+
+    if not enemigo:
+        enemigo = Enemigo(screen_width, random.randint(100, 700))
+
+    if enemigo:
+        enemigo.update()
+        pantalla.blit(enemigo.image, enemigo.rect.topleft)
 
     pygame.display.update()
 
