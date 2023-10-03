@@ -27,10 +27,14 @@ class Jugador(pygame.sprite.Sprite):
         if not self.is_jumping:
             self.velocity[1] += self.gravity
 
-        if self.rect.y >= 600 - 10:
+        if self.rect.y >= 700:
             self.is_jumping = False
-            self.rect.y = 600 - 10
-            self.velocity[1] = 0
+            if not self.is_agachado:
+                self.rect.y = 700
+                self.velocity[1] = 0
+            else:
+                self.rect.y = 750
+                self.velocity[1] = 0
 
     def salto(self):
         if not self.is_jumping:
@@ -41,7 +45,7 @@ class Jugador(pygame.sprite.Sprite):
         if not self.is_agachado:
             self.is_agachado = True
             self.rect.height = 40
-            self.rect.y += 0
+            self.rect.y = self.rect.y + 50
 
     def levantarse(self):
         if self.is_agachado:
