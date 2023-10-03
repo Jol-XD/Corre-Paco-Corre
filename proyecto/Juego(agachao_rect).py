@@ -6,16 +6,14 @@ ROJO = (255, 0, 0)
 FONDO = (5, 130, 250)
 
 class Jugador(pygame.sprite.Sprite):
-    def __init__(self, x, y, velocity_x, velocity_y):
+    def __init__(self, x, y, width, height, velocity_x, velocity_y):
         super().__init__()
-        self.rect = pygame.Rect(x, y, 20, 40)  # Tamaño del rectángulo del jugador
+        self.rect = pygame.Rect(x, y, width, height)
         self.velocity = [velocity_x, velocity_y]
         self.is_jumping = False
-        self.jump_strength = -10
+        self.is_agachado = False
         self.gravity = 0.33
-
-        self.image = pygame.image.load("proyecto/sprites/pibe_palo.png")  
-        self.image = pygame.transform.scale(self.image, (self.rect.width, self.rect.height))
+        self.jump_strength = -10
 
     def update(self):
         self.rect.x += self.velocity[0]
@@ -39,15 +37,27 @@ class Jugador(pygame.sprite.Sprite):
             self.is_jumping = True
             self.velocity[1] = self.jump_strength
 
+    def agacharse(self):
+        if not self.is_agachado:
+            self.is_agachado = True
+            self.rect.height = 20
+            self.rect.y += 20
+
+    def levantarse(self):
+        if self.is_agachado:
+            self.is_agachado = False
+            self.rect.height = 40
+            self.rect.y -= 20
+
     def draw(self, surface):
-        surface.blit(self.image, self.rect.topleft)  # Dibuja la imagen en lugar del rectángulo
+        pygame.draw.rect(surface, ROJO, self.rect)
 
 pygame.init()
 screen_width = 1200
 screen_height = 900
 pantalla = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("¡Corre Paco corre!")
-jugador = Jugador(320, 240, 0, 0)
+jugador = Jugador(320, 240, 40, 80, 0, 0)
 
 run = True
 
@@ -60,6 +70,14 @@ while run:
             if event.key == pygame.K_UP:
                 jugador.salto()
                 print("salto")
+            if event.key == pygame.K_DOWN:
+                jugador.agacharse()
+                print("agachado")
+
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_DOWN:
+                jugador.levantarse()
+                print("levantado")
 
     jugador.update()
 
