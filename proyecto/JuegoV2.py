@@ -45,7 +45,7 @@ class Jugador(pygame.sprite.Sprite):
                 self.rect.y = 700
                 self.velocity[1] = 0
             else:
-                self.rect.y = 750
+                self.rect.y = 735
                 self.velocity[1] = 0
 
     def salto(self):

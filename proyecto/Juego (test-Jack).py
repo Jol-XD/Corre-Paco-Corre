@@ -18,7 +18,7 @@ class Jugador(pygame.sprite.Sprite):
         self.image_stand = pygame.image.load("proyecto/sprites/pibe_palo.png")
         self.image_crouch = pygame.image.load("proyecto/sprites/palo_agacha.png")
 
-
+        # Escalar las imágenes según el tamaño del rectángulo
         self.image_stand = pygame.transform.scale(self.image_stand, (40, 80))
         self.image_crouch = pygame.transform.scale(self.image_crouch, (40, 40))
 
@@ -45,7 +45,7 @@ class Jugador(pygame.sprite.Sprite):
                 self.rect.y = 700
                 self.velocity[1] = 0
             else:
-                self.rect.y = 750
+                self.rect.y = 735
                 self.velocity[1] = 0
 
     def salto(self):
@@ -67,16 +67,14 @@ class Jugador(pygame.sprite.Sprite):
             self.rect.height = 80
             self.rect.y -= 40
 
-
     def draw(self, surface):
-        surface.blit(self.image, self.rect)
+        surface.blit(self.image, self.rect.topleft)
 
 pygame.init()
 screen_width = 1200
 screen_height = 900
 pantalla = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("¡Corre Paco corre!")
-
 jugador = Jugador(320, 240, 0, 0)
 
 run = True
