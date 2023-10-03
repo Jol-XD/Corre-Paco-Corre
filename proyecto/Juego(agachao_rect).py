@@ -40,14 +40,15 @@ class Jugador(pygame.sprite.Sprite):
     def agacharse(self):
         if not self.is_agachado:
             self.is_agachado = True
-            self.rect.height = 20
-            self.rect.y += 20
+            self.rect.height = 40
+            self.rect.y += 0
 
     def levantarse(self):
         if self.is_agachado:
             self.is_agachado = False
-            self.rect.height = 40
-            self.rect.y -= 20
+            self.rect.height = 80
+            self.rect.y -= 0 
+
 
     def draw(self, surface):
         pygame.draw.rect(surface, ROJO, self.rect)
