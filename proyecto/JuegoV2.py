@@ -58,14 +58,14 @@ class Jugador(pygame.sprite.Sprite):
             self.is_agachado = True
             self.image = self.image_crouch
             self.rect.height = 40
-            self.rect.y += 40  
+            self.rect.y += 0
 
     def levantarse(self):
         if self.is_agachado:
             self.is_agachado = False
             self.image = self.image_stand
             self.rect.height = 80
-            self.rect.y -= 40
+            self.rect.y -= 0
 
     def draw(self, surface):
         surface.blit(self.image, self.rect.topleft)
