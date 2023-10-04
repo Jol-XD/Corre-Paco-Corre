@@ -27,6 +27,8 @@ class Jugador(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+        self.attack_rect = None  # Rectángulo de ataque del jugador
+
     def update(self):
         self.rect.x += self.velocity[0]
         self.rect.y += self.velocity[1]
@@ -47,6 +49,12 @@ class Jugador(pygame.sprite.Sprite):
             else:
                 self.rect.y = 735
                 self.velocity[1] = 0
+
+        # Actualizar la posición del rectángulo de ataque
+        if self.is_atacando:
+            self.attack_rect = pygame.Rect(self.rect.x + 40, self.rect.y + 30, 40, 15)
+        else:
+            self.attack_rect = None
 
     def salto(self):
         if not self.is_jumping:
@@ -76,9 +84,21 @@ class Jugador(pygame.sprite.Sprite):
     def draw(self, surface):
         surface.blit(self.image, self.rect.topleft)
 
-        if self.is_atacando:
+        # Dibujar el rectángulo de ataque si está activo
+        if self.is_atacando and self.attack_rect:
+            pygame.draw.rect(surface, ROJO, self.attack_rect)
 
-            pygame.draw.rect(surface, ROJO, (self.rect.x + 40, self.rect.y + 30, 40, 15))
+class Enemigo(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((40, 80))
+        self.image.fill(ROJO)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def desaparecer(self):
+        self.kill()
 
 pygame.init()
 screen_width = 1200
@@ -86,6 +106,10 @@ screen_height = 900
 pantalla = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("¡Corre Paco corre!")
 jugador = Jugador(320, 240, 0, 0)
+
+enemigos = pygame.sprite.Group()  # Grupo para almacenar enemigos
+enemigo = Enemigo(390, 700)  # Crear un enemigo en una posición específica
+enemigos.add(enemigo)  # Agregar el enemigo al grupo de enemigos
 
 run = True
 
@@ -102,7 +126,7 @@ while run:
                 jugador.agacharse()
                 print("agachado")
             if event.key == pygame.K_SPACE:
-                jugador.atacar()  
+                jugador.atacar()
                 print("ataque")
 
         if event.type == pygame.KEYUP:
@@ -110,13 +134,20 @@ while run:
                 jugador.levantarse()
                 print("levantado")
             if event.key == pygame.K_SPACE:
-                jugador.detener_ataque() 
+                jugador.detener_ataque()
 
     jugador.update()
 
     pantalla.fill(FONDO)
 
     jugador.draw(pantalla)
+    enemigos.draw(pantalla)
+
+    # Verificar colisión entre el rectángulo de ataque del jugador y el enemigo
+    if jugador.attack_rect:
+        for enemigo in enemigos:
+            if jugador.attack_rect.colliderect(enemigo.rect):
+                enemigo.desaparecer()  # Hacer que el enemigo desaparezca
 
     pygame.display.update()
 
