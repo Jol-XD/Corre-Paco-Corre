@@ -88,6 +88,7 @@ class Jugador(pygame.sprite.Sprite):
         if self.is_atacando and self.attack_rect:
             pygame.draw.rect(surface, ROJO, self.attack_rect)
 
+
 class Enemigo(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -96,9 +97,33 @@ class Enemigo(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.velocity_x = 2  # Velocidad de movimiento del enemigo
+        self.aparicion_timer = random.randint(200, 500)  # Timer para la aparición aleatoria
+        self.last_aparicion_time = pygame.time.get_ticks()
 
     def desaparecer(self):
         self.kill()
+
+    def update(self):
+        # Mover el enemigo hacia adelante
+        self.rect.x += self.velocity_x
+
+        # Verificar si el enemigo se sale de la pantalla y reiniciar su posición
+        if self.rect.right < 0:
+            self.rect.left = screen_width
+            self.aparicion_timer = random.randint(200, 500)
+
+        # Verificar si es hora de aparecer en una nueva posición aleatoria
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_aparicion_time > self.aparicion_timer:
+            self.rect.x = screen_width  # Mover al enemigo fuera de la pantalla
+            self.rect.y = random.randint(400, 700)  # Nueva posición aleatoria en Y
+            self.aparicion_timer = random.randint(200, 500)
+            self.last_aparicion_time = current_time
+
+# ... (resto del código)
+
+
 
 pygame.init()
 screen_width = 1200

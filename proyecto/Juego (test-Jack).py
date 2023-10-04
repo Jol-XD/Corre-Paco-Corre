@@ -50,7 +50,6 @@ class Jugador(pygame.sprite.Sprite):
                 self.rect.y = 735
                 self.velocity[1] = 0
 
-        # Actualizar la posición del rectángulo de ataque
         if self.is_atacando:
             self.attack_rect = pygame.Rect(self.rect.x + 40, self.rect.y + 30, 40, 15)
         else:
@@ -84,9 +83,10 @@ class Jugador(pygame.sprite.Sprite):
     def draw(self, surface):
         surface.blit(self.image, self.rect.topleft)
 
-        # Dibujar el rectángulo de ataque si está activo
         if self.is_atacando and self.attack_rect:
             pygame.draw.rect(surface, ROJO, self.attack_rect)
+
+# ... (código existente)
 
 class Enemigo(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -96,9 +96,32 @@ class Enemigo(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.velocity_x = 2  # Velocidad de movimiento del enemigo
+        self.aparicion_timer = random.randint(200, 500)  # Timer para la aparición aleatoria
+        self.last_aparicion_time = pygame.time.get_ticks()
 
     def desaparecer(self):
         self.kill()
+
+    def update(self):
+        # Mover el enemigo hacia adelante
+        self.rect.x += self.velocity_x  # Cambio en esta línea
+
+        # Verificar si el enemigo se sale de la pantalla y reiniciar su posición
+        if self.rect.left > screen_width:
+            self.rect.right = 0
+            self.aparicion_timer = random.randint(200, 500)
+
+        # Verificar si es hora de aparecer en una nueva posición aleatoria
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_aparicion_time > self.aparicion_timer:
+            self.rect.x = screen_width  # Mover al enemigo fuera de la pantalla
+            self.rect.y = random.randint(400, 700)  # Nueva posición aleatoria en Y
+            self.aparicion_timer = random.randint(200, 500)
+            self.last_aparicion_time = current_time
+
+# ... (resto del código)
+
 
 pygame.init()
 screen_width = 1200
@@ -108,7 +131,7 @@ pygame.display.set_caption("¡Corre Paco corre!")
 jugador = Jugador(320, 240, 0, 0)
 
 enemigos = pygame.sprite.Group()  # Grupo para almacenar enemigos
-enemigo = Enemigo(390, 700)  # Crear un enemigo en una posición específica
+enemigo = Enemigo(700, 700)  # Crear un enemigo en una posición específica
 enemigos.add(enemigo)  # Agregar el enemigo al grupo de enemigos
 
 run = True
