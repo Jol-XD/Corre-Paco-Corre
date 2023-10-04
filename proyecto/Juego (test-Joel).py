@@ -60,9 +60,9 @@ class Jugador(pygame.sprite.Sprite):
         pygame.draw.rect(surface, ROJO, self.rect)
 
 class Estructura(pygame.sprite.Sprite):
-    def __init__(self, x,gi width, height, velocity):
+    def __init__(self, x, width, height, velocity):
         super().__init__()
-        self.rect = pygame.Rect(x, y, width, height)
+        self.rect = pygame.Rect(x, SCREEN_HEIGHT - height, width, height)
         self.velocity = velocity
 
     def update(self):
