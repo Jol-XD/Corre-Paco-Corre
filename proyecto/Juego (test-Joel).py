@@ -2,8 +2,12 @@ import random
 import time
 import pygame
 
+clock = pygame.time.Clock()
+
 ROJO = (255, 0, 0)
-VERDE = (0, 255, 0)
+VERDE = (28, 121, 28)
+AZUL = (0, 0, 255)
+MARRON = (128, 64, 0)
 FONDO = (5, 130, 250)
 
 #Define al jugador
@@ -14,8 +18,8 @@ class Jugador(pygame.sprite.Sprite):
         self.velocity = [velocity_x, velocity_y]
         self.is_jumping = False
         self.is_agachado = False
-        self.gravity = 0.33
-        self.jump_strength = -10
+        self.gravity = 1.1
+        self.jump_strength = -20
 
     def update(self):
         self.rect.x += self.velocity[0]
@@ -23,8 +27,8 @@ class Jugador(pygame.sprite.Sprite):
 
         self.velocity[1] += self.gravity
 
-        if self.velocity[1] > 3.5:
-            self.velocity[1] = 3.5
+        if self.velocity[1] > 10:
+            self.velocity[1] = 10
 
         if not self.is_jumping:
             self.velocity[1] += self.gravity
@@ -81,9 +85,17 @@ pygame.display.set_caption("¡Corre Paco corre!")
 jugador = Jugador(320, 240, 40, 80, 0, 0)
 
 estructuras = pygame.sprite.Group()
-for _ in range(1):  # Genera inicialmente 5 estructuras
-    nueva_estructura = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 200, 5)
+
+
+for _ in range(1):
+    nueva_estructura = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 220, 10)
     estructuras.add(nueva_estructura)
+
+#    for _ in range(1):  
+#        nueva_estructura = Estructura(random.randint(0, SCREEN_WIDTH), 50, 220, 10)
+#        nueva_estructura.rect.y = -100
+#        estructuras.add(nueva_estructura)
+
 
 run = True
 
@@ -111,9 +123,14 @@ while run:
     pantalla.fill(FONDO)
 
     for estructura in estructuras:
-        pygame.draw.rect(pantalla, VERDE, estructura.rect)
+        pygame.draw.rect(pantalla, MARRON, estructura.rect)
 
     jugador.draw(pantalla)
+
+    pygame.draw.rect(pantalla, VERDE, pygame.Rect(0, 780, 1200, 500))
+
+    pygame.display.flip()  # Actualizar la pantalla
+    clock.tick(60)  # Limitar los FPS a 60
 
     pygame.display.update()
 
