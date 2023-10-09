@@ -50,6 +50,7 @@ class Jugador(pygame.sprite.Sprite):
                 self.rect.y = 735
                 self.velocity[1] = 0
 
+        # Actualizar la posición del rectángulo de ataque
         if self.is_atacando:
             self.attack_rect = pygame.Rect(self.rect.x + 40, self.rect.y + 30, 40, 15)
         else:
@@ -83,10 +84,9 @@ class Jugador(pygame.sprite.Sprite):
     def draw(self, surface):
         surface.blit(self.image, self.rect.topleft)
 
+        # Dibujar el rectángulo de ataque si está activo
         if self.is_atacando and self.attack_rect:
             pygame.draw.rect(surface, ROJO, self.attack_rect)
-
-# ... (código existente)
 
 class Enemigo(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -96,32 +96,30 @@ class Enemigo(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.velocity_x = 2  # Velocidad de movimiento del enemigo
-        self.aparicion_timer = random.randint(200, 500)  # Timer para la aparición aleatoria
+        self.velocity_x = -2  # Velocidad de movimiento del enemigo
+        self.aparicion_timer = random.randint(5000, 8000)  # Timer para la aparición aleatoria
         self.last_aparicion_time = pygame.time.get_ticks()
+        self.derrotado = False  # Variable para rastrear si el enemigo ha sido derrotado
 
-    def desaparecer(self):
-        self.kill()
+    def reiniciar(self):
+        # Reiniciar la posición del enemigo fuera de la pantalla
+        self.rect.x = screen_width
+        self.rect.y = 700
+        self.aparicion_timer = random.randint(5000, 8000)
+        self.last_aparicion_time = pygame.time.get_ticks()
+        self.derrotado = False  # Reiniciar el estado de derrota
 
     def update(self):
         # Mover el enemigo hacia adelante
-        self.rect.x += self.velocity_x  # Cambio en esta línea
+        self.rect.x += self.velocity_x
 
-        # Verificar si el enemigo se sale de la pantalla y reiniciar su posición
-        if self.rect.left > screen_width:
-            self.rect.right = 0
-            self.aparicion_timer = random.randint(200, 500)
-
+        # Verificar si el enemigo ha salido completamente de la pantalla o ha sido derrotado
+        if self.rect.right < 0 or self.derrotado:
+            self.reiniciar()
         # Verificar si es hora de aparecer en una nueva posición aleatoria
         current_time = pygame.time.get_ticks()
         if current_time - self.last_aparicion_time > self.aparicion_timer:
-            self.rect.x = screen_width  # Mover al enemigo fuera de la pantalla
-            self.rect.y = random.randint(400, 700)  # Nueva posición aleatoria en Y
-            self.aparicion_timer = random.randint(200, 500)
-            self.last_aparicion_time = current_time
-
-# ... (resto del código)
-
+            self.reiniciar()
 
 pygame.init()
 screen_width = 1200
@@ -131,8 +129,8 @@ pygame.display.set_caption("¡Corre Paco corre!")
 jugador = Jugador(320, 240, 0, 0)
 
 enemigos = pygame.sprite.Group()  # Grupo para almacenar enemigos
-enemigo = Enemigo(700, 700)  # Crear un enemigo en una posición específica
-enemigos.add(enemigo)  # Agregar el enemigo al grupo de enemigos
+enemigo = Enemigo(screen_width, random.randint(700, 700))  # Crear un enemigo fuera de la pantalla
+enemigos.add(enemigo) 
 
 run = True
 
@@ -159,18 +157,20 @@ while run:
             if event.key == pygame.K_SPACE:
                 jugador.detener_ataque()
 
+    if jugador.attack_rect:
+        for enemigo in enemigos:
+            if jugador.attack_rect.colliderect(enemigo.rect):
+                enemigo.derrotado = True  # Marcar al enemigo como derrotado en lugar de eliminarlo
+                print("¡Enemigo derrotado!")
+
+                
     jugador.update()
+    enemigos.update()
 
     pantalla.fill(FONDO)
 
     jugador.draw(pantalla)
     enemigos.draw(pantalla)
-
-    # Verificar colisión entre el rectángulo de ataque del jugador y el enemigo
-    if jugador.attack_rect:
-        for enemigo in enemigos:
-            if jugador.attack_rect.colliderect(enemigo.rect):
-                enemigo.desaparecer()  # Hacer que el enemigo desaparezca
 
     pygame.display.update()
 
