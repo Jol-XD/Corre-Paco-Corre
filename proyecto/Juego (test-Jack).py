@@ -14,6 +14,7 @@ class Jugador(pygame.sprite.Sprite):
         self.is_atacando = False 
         self.gravity = 0.33
         self.jump_strength = -10
+        self.vida = 3
 
         # Imágenes del jugador
         self.image_stand = pygame.image.load("proyecto/sprites/pibe_palo.png")
@@ -134,6 +135,23 @@ enemigos.add(enemigo)
 
 run = True
 
+font = pygame.font.Font(None, 36)  
+
+corazon_image = pygame.image.load("proyecto/sprites/cora.png")
+corazon_image = pygame.transform.scale(corazon_image, (30, 30))
+
+def mostrar_vida(surface, vida):
+    vida_text = font.render(f"Vida: {vida}", True, ROJO)
+    surface.blit(vida_text, (10, 10))
+
+    x_corazon = 70
+    y_corazon = 10 
+
+    for i in range(vida):
+        surface.blit(corazon_image, (x_corazon, y_corazon))
+        x_corazon += 35 
+
+
 while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -157,13 +175,26 @@ while run:
             if event.key == pygame.K_SPACE:
                 jugador.detener_ataque()
 
-    if jugador.attack_rect:
-        for enemigo in enemigos:
-            if jugador.attack_rect.colliderect(enemigo.rect):
-                enemigo.derrotado = True  # Marcar al enemigo como derrotado en lugar de eliminarlo
-                print("¡Enemigo derrotado!")
+        if jugador.attack_rect:
+            for enemigo in enemigos:
+                if jugador.attack_rect.colliderect(enemigo.rect):
+                    enemigo.derrotado = True  # Marcar al enemigo como derrotado en lugar de eliminarlo
+                    print("¡Enemigo derrotado!")
 
-                
+    # Detección de colisiones mejorada
+    colisiones = pygame.sprite.spritecollide(jugador, enemigos, False)
+    if colisiones:
+        if not jugador.is_atacando:
+            jugador.vida -= 1  # Reducir la vida del jugador en 1 cuando colisione con un enemigo
+            print(f"¡El jugador perdió 1 vida! Vidas restantes: {jugador.vida}")
+        for enemigo in colisiones:
+            enemigo.derrotado = True  # Marcar al enemigo como derrotado en lugar de eliminarlo
+    
+    # Comprobar si el jugador se queda sin vidas
+    if jugador.vida <= 0:
+        print("¡Juego terminado! El jugador se quedó sin vidas.")
+        run = False
+
     jugador.update()
     enemigos.update()
 
@@ -172,6 +203,7 @@ while run:
     jugador.draw(pantalla)
     enemigos.draw(pantalla)
 
+    mostrar_vida(pantalla, jugador.vida)
     pygame.display.update()
 
 pygame.quit()
