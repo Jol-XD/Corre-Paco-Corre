@@ -14,7 +14,7 @@ class Jugador(pygame.sprite.Sprite):
         self.is_atacando = False 
         self.gravity = 0.33
         self.jump_strength = -10
-        self.vida = 3
+        self.vida = 50
         self.attack_duration = 200    # Duración del ataque en milisegundos
         self.attack_timer = 0  # Temporizador para controlar la duración del ataque
 
@@ -133,6 +133,18 @@ class Enemigo(pygame.sprite.Sprite):
         if current_time - self.last_aparicion_time > self.aparicion_timer:
             self.reiniciar()
 
+class EnemigoNormal(Enemigo):
+    def __init__(self, x, y):
+        super().__init__(x, y)
+        self.image = pygame.transform.scale(self.image, (40, 80))
+        self.velocity_x = -random.uniform(1, 3)  
+
+class EnemigoEnano(Enemigo):
+    def __init__(self, x, y):
+        super().__init__(x, y)
+        self.image = pygame.transform.scale(self.image, (20, 40))  
+        self.velocity_x = -random.uniform(0.5, 1.5)  
+
 pygame.init()
 screen_width = 1200
 screen_height = 900
@@ -140,9 +152,15 @@ pantalla = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("¡Corre Paco corre!")
 jugador = Jugador(320, 240, 0, 0)
 
-enemigos = pygame.sprite.Group()  # Grupo para almacenar enemigos
-enemigo = Enemigo(screen_width, random.randint(700, 700))  # Crear un enemigo fuera de la pantalla
-enemigos.add(enemigo) 
+enemigos = pygame.sprite.Group()  
+
+for _ in range(2):  # Crear 3 enemigos normales en este ejemplo
+    enemigo_normal = EnemigoNormal(screen_width, 700)
+    enemigos.add(enemigo_normal)
+
+for _ in range(1):  # Crear 2 enemigos enanos en este ejemplo
+    enemigo_enano = EnemigoEnano(screen_width, 700)
+    enemigos.add(enemigo_enano)
 
 run = True
 
@@ -197,10 +215,10 @@ while run:
     colisiones = pygame.sprite.spritecollide(jugador, enemigos, False)
     if colisiones:
         if not jugador.is_atacando:
-            jugador.vida -= 1  # Reducir la vida del jugador en 1 cuando colisione con un enemigo
+            jugador.vida -= 1  # -1 vida si toca enemigo
             print(f"¡El jugador perdió 1 vida! Vidas restantes: {jugador.vida}")
         for enemigo in colisiones:
-            enemigo.derrotado = True  # Marcar al enemigo como derrotado en lugar de eliminarlo
+            enemigo.derrotado = True  
     
     # Comprobar si el jugador se queda sin vidas
     if jugador.vida <= 0:
