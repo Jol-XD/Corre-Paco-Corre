@@ -68,19 +68,16 @@ class Estructura(pygame.sprite.Sprite):
         super().__init__()
         self.rect = pygame.Rect(x, 0, width, height)  
         self.velocity = velocity
-
+    
     def update(self):
         self.rect.x -= self.velocity
         if self.rect.right < 0:
-            select_structure = random.randint(2, 2)
-            if select_structure == 1:
-                self.rect.x = random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200)
-                self.rect.y = SCREEN_HEIGHT - self.rect.height
-            elif select_structure == 2:
-                self.rect.x = random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200)
-                self.rect.y = SCREEN_HEIGHT - self.rect.height
-
-    
+            self.rect.x = SCREEN_WIDTH + 200
+            stucture_sel = random.randint(1, 2)
+            if stucture_sel==1:
+                self.rect.y = SCREEN_HEIGHT - self.rect.height - 100
+            elif stucture_sel==2:
+                self.rect.y = 720 - self.rect.height   
 
 pygame.init()
 SCREEN_WIDTH = 1200
@@ -89,11 +86,14 @@ pantalla = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("¡Corre Paco corre!")
 jugador = Jugador(320, 240, 40, 80, 0, 0)
 
+estructura1 = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 220, 10)
+estructura2 = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 220, 10)
+
 estructuras = pygame.sprite.Group()
 
 
 for _ in range(1):
-    nueva_estructura = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 220, 10)
+    nueva_estructura = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 120, 10)
     estructuras.add(nueva_estructura)
 
 run = True
