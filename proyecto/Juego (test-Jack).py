@@ -15,6 +15,8 @@ class Jugador(pygame.sprite.Sprite):
         self.gravity = 0.33
         self.jump_strength = -10
         self.vida = 3
+        self.attack_duration = 200    # Duración del ataque en milisegundos
+        self.attack_timer = 0  # Temporizador para controlar la duración del ataque
 
         # Imágenes del jugador
         self.image_stand = pygame.image.load("proyecto/sprites/pibe_palo.png")
@@ -54,6 +56,12 @@ class Jugador(pygame.sprite.Sprite):
         # Actualizar la posición del rectángulo de ataque
         if self.is_atacando:
             self.attack_rect = pygame.Rect(self.rect.x + 40, self.rect.y + 30, 40, 15)
+            self.attack_timer += pygame.time.get_ticks() - self.last_update_time
+            self.last_update_time = pygame.time.get_ticks()
+            
+            # Si el tiempo de ataque supera la duración, detener el ataque
+            if self.attack_timer >= self.attack_duration:
+                self.detener_ataque()
         else:
             self.attack_rect = None
 
@@ -77,7 +85,10 @@ class Jugador(pygame.sprite.Sprite):
             self.rect.y -= 0
 
     def atacar(self):
-        self.is_atacando = True
+        if not self.is_atacando:
+            self.is_atacando = True
+            self.attack_timer = 0
+            self.last_update_time = pygame.time.get_ticks()
 
     def detener_ataque(self):
         self.is_atacando = False
@@ -161,7 +172,7 @@ while run:
             if event.key == pygame.K_UP:
                 jugador.salto()
                 print("salto")
-            if event.key == pygame.K_DOWN:
+            if event.key == pygame.K_DOWN:     
                 jugador.agacharse()
                 print("agachado")
             if event.key == pygame.K_SPACE:
@@ -174,6 +185,7 @@ while run:
                 print("levantado")
             if event.key == pygame.K_SPACE:
                 jugador.detener_ataque()
+
 
         if jugador.attack_rect:
             for enemigo in enemigos:
