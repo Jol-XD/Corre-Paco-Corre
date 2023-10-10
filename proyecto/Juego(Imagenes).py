@@ -1,5 +1,4 @@
 import random
-import time
 import pygame
 
 ROJO = (255, 0, 0)
@@ -14,18 +13,21 @@ class Jugador(pygame.sprite.Sprite):
         self.gravity = 0.33
         self.jump_strength = -10
 
-        # Imágenes del jugador
-        self.image_stand = pygame.image.load("proyecto/sprites/pibe_palo.png")
-        self.image_crouch = pygame.image.load("proyecto/sprites/palo_agacha.png")
+        # Cargar los cuadros individuales de la animación desde un archivo GIF
+        self.animacion = []
+        for i in range(1,8):  # Cambia el número según la cantidad de cuadros en tu GIF
+            frame = pygame.image.load(f"proyecto/sprites/corre/corre{i}.PNG")
+            frame = pygame.transform.scale(frame, (100, 120))
+            self.animacion.append(frame)
 
-        # Escalar las imágenes según el tamaño del rectángulo
-        self.image_stand = pygame.transform.scale(self.image_stand, (40, 80))
-        self.image_crouch = pygame.transform.scale(self.image_crouch, (40, 40))
+        self.indice_animacion = 0  # Índice actual de la animación
+        self.image = self.animacion[self.indice_animacion]
 
-        self.image = self.image_stand 
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.tiempo_animacion = 100  # Tiempo de espera entre cuadros
+        self.ultimo_cambio = pygame.time.get_ticks()
 
     def update(self):
         self.rect.x += self.velocity[0]
@@ -48,6 +50,13 @@ class Jugador(pygame.sprite.Sprite):
                 self.rect.y = 735
                 self.velocity[1] = 0
 
+        # Actualizar la animación
+        tiempo_actual = pygame.time.get_ticks()
+        if tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
+            self.indice_animacion = (self.indice_animacion + 1) % len(self.animacion)
+            self.image = self.animacion[self.indice_animacion]
+            self.ultimo_cambio = tiempo_actual
+
     def salto(self):
         if not self.is_jumping:
             self.is_jumping = True
@@ -56,14 +65,12 @@ class Jugador(pygame.sprite.Sprite):
     def agacharse(self):
         if not self.is_agachado:
             self.is_agachado = True
-            self.image = self.image_crouch
             self.rect.height = 40
-            self.rect.y += 40  
+            self.rect.y += 40
 
     def levantarse(self):
         if self.is_agachado:
             self.is_agachado = False
-            self.image = self.image_stand
             self.rect.height = 80
             self.rect.y -= 40
 
