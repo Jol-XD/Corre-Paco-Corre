@@ -3,6 +3,7 @@ import time
 import pygame
 
 clock = pygame.time.Clock()
+v   
 
 ROJO = (255, 0, 0)
 VERDE = (28, 121, 28)
@@ -73,11 +74,13 @@ class Estructura(pygame.sprite.Sprite):
         self.rect.x -= self.velocity
         if self.rect.right < 0:
             self.rect.x = SCREEN_WIDTH + 200
+            vel = vel + 1
             stucture_sel = random.randint(1, 2)
             if stucture_sel==1:
                 self.rect.y = SCREEN_HEIGHT - self.rect.height - 100
             elif stucture_sel==2:
-                self.rect.y = 720 - self.rect.height   
+                self.rect.y = 720 - self.rect.height  
+         
 
 pygame.init()
 SCREEN_WIDTH = 1200
@@ -86,17 +89,16 @@ pantalla = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("¡Corre Paco corre!")
 jugador = Jugador(320, 240, 40, 80, 0, 0)
 
-estructura1 = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 220, 10)
-estructura2 = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 220, 10)
-
 estructuras = pygame.sprite.Group()
 
 
 for _ in range(1):
-    nueva_estructura = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 120, 10)
+    nueva_estructura = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 120, vel)
     estructuras.add(nueva_estructura)
 
 run = True
+perder = False
+
 
 while run:
     for event in pygame.event.get():
@@ -104,17 +106,25 @@ while run:
             run = False
 
         if event.type == pygame.KEYDOWN:
+             #Si pulsas la flecha arriba sasltas
             if event.key == pygame.K_UP:
                 jugador.salto()
                 print("salto")
+            #Si pulsas la flecha abajo te agachas
             if event.key == pygame.K_DOWN:
                 jugador.agacharse()
                 print("agachado")
 
+        #Si sueltas la flecha abajo te levantas
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_DOWN:
                 jugador.levantarse()
                 print("levantado")
+        
+    choque = pygame.sprite.spritecollide(jugador, estructuras, False)
+    if choque:
+        run = False
+        perder = True
 
     jugador.update()
     estructuras.update()
