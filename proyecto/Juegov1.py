@@ -76,3 +76,5 @@ while run:
     
 
 pygame.quit()
+
+#Eres Gay
