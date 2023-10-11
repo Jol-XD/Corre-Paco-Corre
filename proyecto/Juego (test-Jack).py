@@ -4,6 +4,8 @@ import pygame
 
 ROJO = (255, 0, 0)
 FONDO = (5, 130, 250)
+AZUL = (0, 0, 255)
+GREEN = (0, 255, 0)
 
 class Jugador(pygame.sprite.Sprite):
     def __init__(self, x, y, velocity_x, velocity_y):
@@ -104,22 +106,13 @@ class Enemigo(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.image = pygame.Surface((40, 80))
-        self.image.fill(ROJO)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.velocity_x = -2  # Velocidad de movimiento del enemigo
-        self.aparicion_timer = random.randint(5000, 8000)  # Timer para la aparición aleatoria
+        self.aparicion_timer = random.randint(5000, 8000)  
         self.last_aparicion_time = pygame.time.get_ticks()
-        self.derrotado = False  # Variable para rastrear si el enemigo ha sido derrotado
-
-    def reiniciar(self):
-        # Reiniciar la posición del enemigo fuera de la pantalla
-        self.rect.x = screen_width
-        self.rect.y = 700
-        self.aparicion_timer = random.randint(5000, 8000)
-        self.last_aparicion_time = pygame.time.get_ticks()
-        self.derrotado = False  # Reiniciar el estado de derrota
+        self.velocity_x = -1  # Se agregó la velocidad
+        self.derrotado = False 
 
     def update(self):
         # Mover el enemigo hacia adelante
@@ -128,6 +121,7 @@ class Enemigo(pygame.sprite.Sprite):
         # Verificar si el enemigo ha salido completamente de la pantalla o ha sido derrotado
         if self.rect.right < 0 or self.derrotado:
             self.reiniciar()
+
         # Verificar si es hora de aparecer en una nueva posición aleatoria
         current_time = pygame.time.get_ticks()
         if current_time - self.last_aparicion_time > self.aparicion_timer:
@@ -137,13 +131,47 @@ class EnemigoNormal(Enemigo):
     def __init__(self, x, y):
         super().__init__(x, y)
         self.image = pygame.transform.scale(self.image, (40, 80))
-        self.velocity_x = -random.uniform(1, 3)  
+        self.image.fill(ROJO)
+
+    def reiniciar(self):
+        # Reiniciar la posición del enemigo
+        self.rect.x = screen_width
+        self.rect.y = 700
+        self.aparicion_timer = random.randint(5000, 8000)
+        self.last_aparicion_time = pygame.time.get_ticks()
+        self.derrotado = False
 
 class EnemigoEnano(Enemigo):
     def __init__(self, x, y):
+        super().__init__(x, 755)
+        self.image = pygame.transform.scale(self.image, (30, 25))
+        self.velocity_x = -3
+        self.rect.y = 755  
+        self.image.fill(GREEN)
+
+    def reiniciar(self):
+        # Reiniciar la posición del enemigo
+        self.rect.x = screen_width
+        self.rect.y = 755
+        self.aparicion_timer = random.randint(5000, 8000)
+        self.last_aparicion_time = pygame.time.get_ticks()
+        self.derrotado = False
+
+class EnemigoVolador(Enemigo):
+    def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.transform.scale(self.image, (20, 40))  
-        self.velocity_x = -random.uniform(0.5, 1.5)  
+        self.image = pygame.transform.scale(self.image, (40, 50))
+        self.velocity_x = -2
+        self.image.fill(AZUL)
+        
+    def reiniciar(self):
+        # Reiniciar la posición del enemigo
+        self.rect.x = screen_width
+        self.rect.y = 700
+        self.aparicion_timer = random.randint(5000, 8000)
+        self.last_aparicion_time = pygame.time.get_ticks()
+        self.derrotado = False
+
 
 pygame.init()
 screen_width = 1200
@@ -154,18 +182,24 @@ jugador = Jugador(320, 240, 0, 0)
 
 enemigos = pygame.sprite.Group()  
 
-for _ in range(2):  # Crear 3 enemigos normales en este ejemplo
-    enemigo_normal = EnemigoNormal(screen_width, 700)
-    enemigos.add(enemigo_normal)
-
-for _ in range(1):  # Crear 2 enemigos enanos en este ejemplo
-    enemigo_enano = EnemigoEnano(screen_width, 700)
-    enemigos.add(enemigo_enano)
-
 run = True
 
-font = pygame.font.Font(None, 36)  
+spawn_timer = 0
+spawn_interval = 3000 
 
+def generar_enemigo():
+    # Clases de enemigos disponibles
+    clases_enemigos = [EnemigoNormal, EnemigoEnano, EnemigoVolador]
+
+    # Elije una clase de enemigo aleatoriamente
+    clase_enemigo = random.choice(clases_enemigos)
+
+    # Crea un enemigo de la clase elegida
+    enemigo = clase_enemigo(screen_width, 700)
+
+    return enemigo
+
+font = pygame.font.Font(None, 36)
 corazon_image = pygame.image.load("proyecto/sprites/cora.png")
 corazon_image = pygame.transform.scale(corazon_image, (30, 30))
 
@@ -174,12 +208,11 @@ def mostrar_vida(surface, vida):
     surface.blit(vida_text, (10, 10))
 
     x_corazon = 70
-    y_corazon = 10 
+    y_corazon = 10
 
     for i in range(vida):
         surface.blit(corazon_image, (x_corazon, y_corazon))
-        x_corazon += 35 
-
+        x_corazon += 35
 
 while run:
     for event in pygame.event.get():
@@ -190,7 +223,7 @@ while run:
             if event.key == pygame.K_UP:
                 jugador.salto()
                 print("salto")
-            if event.key == pygame.K_DOWN:     
+            if event.key == pygame.K_DOWN:
                 jugador.agacharse()
                 print("agachado")
             if event.key == pygame.K_SPACE:
@@ -203,7 +236,6 @@ while run:
                 print("levantado")
             if event.key == pygame.K_SPACE:
                 jugador.detener_ataque()
-
 
         if jugador.attack_rect:
             for enemigo in enemigos:
@@ -218,8 +250,8 @@ while run:
             jugador.vida -= 1  # -1 vida si toca enemigo
             print(f"¡El jugador perdió 1 vida! Vidas restantes: {jugador.vida}")
         for enemigo in colisiones:
-            enemigo.derrotado = True  
-    
+            enemigo.derrotado = True
+
     # Comprobar si el jugador se queda sin vidas
     if jugador.vida <= 0:
         print("¡Juego terminado! El jugador se quedó sin vidas.")
@@ -227,6 +259,14 @@ while run:
 
     jugador.update()
     enemigos.update()
+
+    current_time = pygame.time.get_ticks()
+
+    # Comprueba si es hora de generar un nuevo enemigo
+    if current_time - spawn_timer > spawn_interval:
+        enemigo = generar_enemigo()
+        enemigos.add(enemigo)
+        spawn_timer = current_time  
 
     pantalla.fill(FONDO)
 
