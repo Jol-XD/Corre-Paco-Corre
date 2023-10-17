@@ -12,7 +12,7 @@ FONDO = (5, 130, 250)
 
 
 pygame.init()
-SCREEN_WIDTH = 1200git 
+SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 900
 pantalla = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("¡Corre Paco corre!")
