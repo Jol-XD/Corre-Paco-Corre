@@ -2,14 +2,22 @@ import random
 import time
 import pygame
 
-clock = pygame.time.Clock()
-v   
+clock = pygame.time.Clock()  
 
 ROJO = (255, 0, 0)
 VERDE = (28, 121, 28)
 AZUL = (0, 0, 255)
 MARRON = (128, 64, 0)
 FONDO = (5, 130, 250)
+
+
+pygame.init()
+SCREEN_WIDTH = 1200git 
+SCREEN_HEIGHT = 900
+pantalla = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("¡Corre Paco corre!")
+
+sprite_caja2 = pygame.image.load("sprites/structuras/structure1(small).png").convert_alpha()
 
 #Define al jugador
 class Jugador(pygame.sprite.Sprite):
@@ -67,6 +75,7 @@ class Jugador(pygame.sprite.Sprite):
 class Estructura(pygame.sprite.Sprite):
     def __init__(self, x, width, height, velocity):
         super().__init__()
+        self.image = sprite_caja2
         self.rect = pygame.Rect(x, 0, width, height)  
         self.velocity = velocity
     
@@ -74,26 +83,20 @@ class Estructura(pygame.sprite.Sprite):
         self.rect.x -= self.velocity
         if self.rect.right < 0:
             self.rect.x = SCREEN_WIDTH + 200
-            vel = vel + 1
             stucture_sel = random.randint(1, 2)
             if stucture_sel==1:
                 self.rect.y = SCREEN_HEIGHT - self.rect.height - 100
             elif stucture_sel==2:
-                self.rect.y = 720 - self.rect.height  
+                self.rect.y = 720 - self.rect.height
+            self.velocity += 1
+                
          
-
-pygame.init()
-SCREEN_WIDTH = 1200
-SCREEN_HEIGHT = 900
-pantalla = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("¡Corre Paco corre!")
 jugador = Jugador(320, 240, 40, 80, 0, 0)
 
 estructuras = pygame.sprite.Group()
 
-
 for _ in range(1):
-    nueva_estructura = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 120, vel)
+    nueva_estructura = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 120, 10)
     estructuras.add(nueva_estructura)
 
 run = True
@@ -123,8 +126,12 @@ while run:
         
     choque = pygame.sprite.spritecollide(jugador, estructuras, False)
     if choque:
-        run = False
-        perder = True
+        estructura_colisionada = choque[0]  # Obtén la primera estructura con la que ha colisionado
+        if jugador.rect.right > estructura_colisionada.rect.left:
+            jugador.rect.right = estructura_colisionada.rect.left
+            
+    if jugador.rect.right < 0:
+        run=False
 
     jugador.update()
     estructuras.update()
