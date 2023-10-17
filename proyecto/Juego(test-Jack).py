@@ -16,7 +16,7 @@ class Jugador(pygame.sprite.Sprite):
         self.is_atacando = False 
         self.gravity = 0.33
         self.jump_strength = -10
-        self.vida = 50
+        self.vida = 5
         self.attack_duration = 200    # Duración del ataque en milisegundos
         self.attack_timer = 0  # Temporizador para controlar la duración del ataque
 
@@ -172,6 +172,25 @@ class EnemigoVolador(Enemigo):
         self.last_aparicion_time = pygame.time.get_ticks()
         self.derrotado = False
 
+tiempo_ultimo_punto = 0 
+puntuacion = 0
+
+def actualizar_puntuacion():
+    global puntuacion
+    global tiempo_ultimo_punto
+
+    tiempo_actual = pygame.time.get_ticks()
+
+    # Comprueba si ha pasado al menos 10 segundos desde el último punto sumado
+    if tiempo_actual - tiempo_ultimo_punto >= 5000:  # 10000 milisegundos = 10 segundos
+        puntuacion += 1
+        tiempo_ultimo_punto = tiempo_actual  # Actualiza el tiempo del último punto sumado 
+
+    puntuacion_texto = font.render(f"Puntuación: {puntuacion}", True, GREEN)
+    puntuacion_rect = puntuacion_texto.get_rect()
+    puntuacion_rect.topright = (screen_width - 10, 10)
+    pantalla.blit(puntuacion_texto, puntuacion_rect.topleft)
+
 
 pygame.init()
 screen_width = 1200
@@ -232,18 +251,18 @@ while run:
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_DOWN:
-                jugador.levantarse()
-                print("levantado")
-            if event.key == pygame.K_SPACE:
+                jugador.levantarse() 
+                print("levantado") 
+            if event.key == pygame. K_SPACE:
                 jugador.detener_ataque()
 
         if jugador.attack_rect:
             for enemigo in enemigos:
                 if jugador.attack_rect.colliderect(enemigo.rect):
                     enemigo.derrotado = True  # Marcar al enemigo como derrotado en lugar de eliminarlo
+                    puntuacion += 5  # Suma 10 puntos
                     print("¡Enemigo derrotado!")
 
-    # Detección de colisiones mejorada
     colisiones = pygame.sprite.spritecollide(jugador, enemigos, False)
     if colisiones:
         if not jugador.is_atacando:
@@ -256,6 +275,7 @@ while run:
     if jugador.vida <= 0:
         print("¡Juego terminado! El jugador se quedó sin vidas.")
         run = False
+        
 
     jugador.update()
     enemigos.update()
@@ -274,6 +294,7 @@ while run:
     enemigos.draw(pantalla)
 
     mostrar_vida(pantalla, jugador.vida)
+    actualizar_puntuacion()
     pygame.display.update()
 
 pygame.quit()
