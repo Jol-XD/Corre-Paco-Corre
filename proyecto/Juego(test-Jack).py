@@ -103,16 +103,19 @@ class Jugador(pygame.sprite.Sprite):
             pygame.draw.rect(surface, ROJO, self.attack_rect)
 
 class Enemigo(pygame.sprite.Sprite):
+    tipos_enemigos = [EnemigoNormal, EnemigoEnano, EnemigoVolador]
+
     def __init__(self, x, y):
         super().__init__()
+        self.tipo = None  # Nuevo atributo para el tipo de enemigo
         self.image = pygame.Surface((40, 80))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.aparicion_timer = random.randint(5000, 8000)  
+        self.aparicion_timer = random.randint(5000, 8000)
         self.last_aparicion_time = pygame.time.get_ticks()
-        self.velocity_x = -1  # Se agregó la velocidad
-        self.derrotado = False 
+        self.velocity_x = -1
+        self.derrotado = False
 
     def update(self):
         # Mover el enemigo hacia adelante
@@ -126,6 +129,22 @@ class Enemigo(pygame.sprite.Sprite):
         current_time = pygame.time.get_ticks()
         if current_time - self.last_aparicion_time > self.aparicion_timer:
             self.reiniciar()
+
+    def reiniciar(self):
+        # Reiniciar la posición del enemigo
+        self.rect.x = screen_width
+        self.rect.y = 700
+        self.aparicion_timer = random.randint(5000, 8000)
+        self.last_aparicion_time = pygame.time.get_ticks()
+        self.derrotado = False
+
+        # Elegir un tipo de enemigo aleatorio
+        self.tipo = random.choice(self.tipos_enemigos)
+
+        # Crear un nuevo enemigo de ese tipo
+        nuevo_enemigo = self.tipo(screen_width, 700)
+        self.image.fill(nuevo_enemigo.image.get_at((0, 0)))  # Pinta el fondo del nuevo enemigo con el color del tipo
+        self.velocity_x = nuevo_enemigo.velocity_x
 
 class EnemigoNormal(Enemigo):
     def __init__(self, x, y):
