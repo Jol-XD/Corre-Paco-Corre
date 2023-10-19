@@ -17,6 +17,11 @@ SCREEN_HEIGHT = 900
 pantalla = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("¡Corre Paco corre!")
 
+<<<<<<< HEAD
+=======
+sprite_caja2 = pygame.image.load("proyecto/sprites/structuras/structure1(small).png").convert_alpha()
+
+>>>>>>> bc6c635137d1fd0ad70b8241c5bda8b223da4237
 #Define al jugador
 class Jugador(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, velocity_x, velocity_y):
@@ -87,7 +92,7 @@ class Estructura(pygame.sprite.Sprite):
                 self.rect.y = 720 - self.rect.height
             self.velocity += 1
                 
-         
+        
 jugador = Jugador(320, 240, 40, 80, 0, 0)
 
 estructuras = pygame.sprite.Group()

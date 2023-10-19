@@ -6,6 +6,7 @@ ROJO = (255, 0, 0)
 FONDO = (5, 130, 250)
 AZUL = (0, 0, 255)
 GREEN = (0, 255, 0)
+BLACK = (0, 0, 0)
 
 class Jugador(pygame.sprite.Sprite):
     def __init__(self, x, y, velocity_x, velocity_y):
@@ -103,16 +104,18 @@ class Jugador(pygame.sprite.Sprite):
             pygame.draw.rect(surface, ROJO, self.attack_rect)
 
 class Enemigo(pygame.sprite.Sprite):
+
     def __init__(self, x, y):
         super().__init__()
+        self.tipo = None  # Nuevo atributo para el tipo de enemigo
         self.image = pygame.Surface((40, 80))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.aparicion_timer = random.randint(5000, 8000)  
+        self.aparicion_timer = random.randint(5000, 8000)
         self.last_aparicion_time = pygame.time.get_ticks()
-        self.velocity_x = -1  # Se agregó la velocidad
-        self.derrotado = False 
+        self.velocity_x = -1
+        self.derrotado = False
 
     def update(self):
         # Mover el enemigo hacia adelante
@@ -126,6 +129,19 @@ class Enemigo(pygame.sprite.Sprite):
         current_time = pygame.time.get_ticks()
         if current_time - self.last_aparicion_time > self.aparicion_timer:
             self.reiniciar()
+
+    def reiniciar(self):
+        # Reiniciar la posición del enemigo
+        self.rect.x = screen_width
+        self.rect.y = 700
+        self.aparicion_timer = random.randint(5000, 8000)
+        self.last_aparicion_time = pygame.time.get_ticks()
+        self.derrotado = False
+
+        # Crear un nuevo enemigo de ese tipo
+        nuevo_enemigo = self.tipo(screen_width, 700)
+        self.image.fill(nuevo_enemigo.image.get_at((0, 0)))  # Pinta el fondo del nuevo enemigo con el color del tipo
+        self.velocity_x = nuevo_enemigo.velocity_x
 
 class EnemigoNormal(Enemigo):
     def __init__(self, x, y):
@@ -174,6 +190,7 @@ class EnemigoVolador(Enemigo):
 
 tiempo_ultimo_punto = 0 
 puntuacion = 0
+tipos_enemigos = [EnemigoNormal, EnemigoEnano, EnemigoVolador]
 
 def actualizar_puntuacion():
     global puntuacion
@@ -233,6 +250,24 @@ def mostrar_vida(surface, vida):
         surface.blit(corazon_image, (x_corazon, y_corazon))
         x_corazon += 35
 
+has_muerto_image = pygame.image.load("proyecto/sprites/has_muerto.png")
+has_muerto_image = pygame.transform.scale(has_muerto_image, (500, 300))
+
+def mostrar_mensaje_muerte(surface):
+    global run
+
+    surface.blit(has_muerto_image, (350, 200))
+    pygame.display.update()
+    
+    muerto = True
+    while muerto:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                muerto = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                muerto = False
+
 while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -256,6 +291,8 @@ while run:
             if event.key == pygame. K_SPACE:
                 jugador.detener_ataque()
 
+
+
         if jugador.attack_rect:
             for enemigo in enemigos:
                 if jugador.attack_rect.colliderect(enemigo.rect):
@@ -274,7 +311,8 @@ while run:
     # Comprobar si el jugador se queda sin vidas
     if jugador.vida <= 0:
         print("¡Juego terminado! El jugador se quedó sin vidas.")
-        run = False
+        pantalla.fill(BLACK)
+        mostrar_mensaje_muerte(pantalla)
         
 
     jugador.update()
