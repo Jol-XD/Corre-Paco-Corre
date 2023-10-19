@@ -8,7 +8,7 @@ AZUL = (0, 0, 255)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 MARRON = (128, 64, 0)
-
+SUELO = (28, 121, 28)
 clock = pygame.time.Clock()  
 
 class Jugador(pygame.sprite.Sprite):
@@ -18,8 +18,8 @@ class Jugador(pygame.sprite.Sprite):
         self.is_jumping = False
         self.is_agachado = False
         self.is_atacando = False 
-        self.gravity = 0.33
-        self.jump_strength = -10
+        self.gravity = 1.1
+        self.jump_strength = -20
         self.vida = 5
         self.attack_duration = 200    # Duración del ataque en milisegundos
         self.attack_timer = 0  # Temporizador para controlar la duración del ataque
@@ -44,8 +44,8 @@ class Jugador(pygame.sprite.Sprite):
 
         self.velocity[1] += self.gravity
 
-        if self.velocity[1] > 3.5:
-            self.velocity[1] = 3.5
+        if self.velocity[1] > 10:
+            self.velocity[1] = 10
 
         if not self.is_jumping:
             self.velocity[1] += self.gravity
@@ -117,7 +117,7 @@ class Enemigo(pygame.sprite.Sprite):
         self.rect.y = y
         self.aparicion_timer = random.randint(5000, 8000)
         self.last_aparicion_time = pygame.time.get_ticks()
-        self.velocity_x = -1
+        self.velocity_x = -3
         self.derrotado = False
 
     def update(self):
@@ -164,7 +164,7 @@ class EnemigoEnano(Enemigo):
     def __init__(self, x, y):
         super().__init__(x, 755)
         self.image = pygame.transform.scale(self.image, (30, 25))
-        self.velocity_x = -3
+        self.velocity_x = -6
         self.rect.y = 755  
         self.image.fill(GREEN)
 
@@ -180,7 +180,7 @@ class EnemigoVolador(Enemigo):
     def __init__(self, x, y):
         super().__init__(x, y)
         self.image = pygame.transform.scale(self.image, (40, 50))
-        self.velocity_x = -2
+        self.velocity_x = -5
         self.image.fill(AZUL)
         
     def reiniciar(self):
@@ -237,6 +237,7 @@ def generar_enemigo():
     enemigo = clase_enemigo(screen_width, 700)
 
     return enemigo
+
 
 sprite_caja2 = pygame.image.load("proyecto/sprites/structuras/structure1(small).png").convert_alpha()
 
@@ -360,9 +361,6 @@ while run:
 
     current_time = pygame.time.get_ticks()
 
-    for estructura in estructuras:
-        pygame.draw.rect(pantalla, MARRON, estructura.rect)
-
     # Comprueba si es hora de generar un nuevo enemigo
     if current_time - spawn_timer > spawn_interval:
         enemigo = generar_enemigo()
@@ -371,9 +369,12 @@ while run:
 
     pantalla.fill(FONDO)
 
+    for estructura in estructuras:
+        pygame.draw.rect(pantalla, MARRON, estructura.rect)
+
     jugador.draw(pantalla)
     enemigos.draw(pantalla)
-    pygame.draw.rect(pantalla, GREEN, pygame.Rect(0, 780, 1200, 500))
+    pygame.draw.rect(pantalla, SUELO, pygame.Rect(0, 780, 1200, 500))
 
     mostrar_vida(pantalla, jugador.vida)
     actualizar_puntuacion()

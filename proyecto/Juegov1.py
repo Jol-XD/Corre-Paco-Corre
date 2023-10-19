@@ -85,7 +85,7 @@ class Estructura(pygame.sprite.Sprite):
                 self.rect.y = SCREEN_HEIGHT - self.rect.height - 100
             elif stucture_sel==2:
                 self.rect.y = 720 - self.rect.height
-            self.velocity += 1
+            self.velocity += 0.25
                 
         
 jugador = Jugador(320, 240, 40, 80, 0, 0)
@@ -93,7 +93,7 @@ jugador = Jugador(320, 240, 40, 80, 0, 0)
 estructuras = pygame.sprite.Group()
 
 for _ in range(1):
-    nueva_estructura = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 120, 10)
+    nueva_estructura = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 120, 2)
     estructuras.add(nueva_estructura)
 
 run = True
