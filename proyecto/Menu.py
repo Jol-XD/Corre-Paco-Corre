@@ -1,5 +1,4 @@
 import pygame
-import os
 import sys
 
 pygame.init()
@@ -20,9 +19,6 @@ class Boton():
 
     def draw(self):
         pantalla.blit(self.image, (self.rect.x, self.rect.y))
-
-def cambiar_a_juego():
-    os.system("proyecto/JuegoV2.py")
 
 def salir_del_juego():
     pygame.quit()
@@ -78,7 +74,7 @@ while run:
         if event.type == pygame.MOUSEBUTTONUP:
             if jugar_btn.clicked:
                 jugar_btn.clicked = False
-                cambiar_a_juego()
+
             if salir_btn.clicked:
                 salir_btn.clicked = False
                 if mostrar_mensaje_salida():
