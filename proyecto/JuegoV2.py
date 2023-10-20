@@ -1,15 +1,141 @@
 import random
 import time
 import pygame
+import sys
 
-ROJO = (255, 0, 0)
+MENU = (202, 228, 241)
 FONDO = (5, 130, 250)
+ROJO = (255, 0, 0)
 AZUL = (0, 0, 255)
 GREEN = (0, 255, 0)
-BLACK = (0, 0, 0)
+NEGRO = (0, 0, 0)
 MARRON = (128, 64, 0)
 SUELO = (28, 121, 28)
 clock = pygame.time.Clock()  
+
+pygame.init()
+
+screen_width = 1200
+screen_height = 900
+pantalla = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("¡Corre Paco corre!")
+
+class Boton():
+    def __init__(self, x, y, image, scale):
+        width = image.get_width()
+        height = image.get_height()
+        self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+        self.clicked = False
+
+    def draw(self):
+        pantalla.blit(self.image, (self.rect.x, self.rect.y))
+
+def salir_del_juego():
+    pygame.quit()
+    sys.exit()
+
+jugar_img = pygame.image.load('proyecto/sprites/JUGAR1.png').convert_alpha()
+jugar_presionado_img = pygame.image.load('proyecto/sprites/jugar02.png').convert_alpha()
+salir_img = pygame.image.load('proyecto/sprites/SALIR1.png').convert_alpha()
+salir_presionado_img = pygame.image.load('proyecto/sprites/salir002.png').convert_alpha()
+No_img = pygame.image.load('proyecto/sprites/no.png').convert_alpha()
+Si_img = pygame.image.load('proyecto/sprites/si.png').convert_alpha()
+
+jugar_btn = Boton(445, 391, jugar_img, 5.25)
+salir_btn = Boton(446, 525, salir_img, 5.25)
+yes_btn = Boton(350, 400, Si_img, 5.25)
+no_btn = Boton(675, 400, No_img, 5.25)
+
+menu_activo = True
+juego_activo = False
+
+def mostrar_mensaje_salida():
+    pantalla.fill((202, 228, 241))
+    mensaje = "¿Enserio deseas salir del juego?"
+    font = pygame.font.SysFont("arialblack", 40)
+    draw_text(mensaje, font, (255, 255, 255), 270, 300)
+
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if yes_btn.rect.collidepoint(event.pos):
+                    pygame.quit()
+                    sys.exit()
+                elif no_btn.rect.collidepoint(event.pos):
+                    return False
+
+        yes_btn.draw()
+        no_btn.draw()
+        pygame.display.update()
+
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    pantalla.blit(img, (x, y))
+
+def mostrar_menu():
+    global menu_activo, juego_activo, puntuacion, tiempo_ultimo_punto
+
+    menu_activo = True
+    juego_activo = False
+    puntuacion = 0
+    tiempo_ultimo_punto = 0
+
+    # Restablece la posición del jugador
+    jugador.rect.x = 320
+    jugador.rect.y = 240
+    jugador.velocity = [0, 0]
+    jugador.vida = 5
+
+    # Restablece la posición de las estructuras
+    estructuras.empty()
+    for _ in range(1):
+        nueva_estructura = Estructura(random.randint(screen_width, screen_width + 200), 50, 120, 10)
+        estructuras.add(nueva_estructura)
+
+    # Reinicia el tiempo de aparición de los enemigos
+    spawn_timer = 0
+
+    while menu_activo:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if jugar_btn.rect.collidepoint(event.pos):
+                    jugar_btn.clicked = True
+                if salir_btn.rect.collidepoint(event.pos):
+                    salir_btn.clicked = True
+
+            if event.type == pygame.MOUSEBUTTONUP:
+                if jugar_btn.clicked:
+                    menu_activo = False
+                    juego_activo = True
+                    jugar_btn.clicked = False
+                if salir_btn.clicked:
+                    salir_btn.clicked = False
+                    if mostrar_mensaje_salida():
+                        run = False
+
+
+        if jugar_btn.clicked:
+            jugar_btn.image = pygame.transform.scale(jugar_img, (int(jugar_img.get_width() * 5.25), int(jugar_img.get_height() * 5.25)))
+        else:
+            jugar_btn.image = pygame.transform.scale(jugar_img, (int(jugar_img.get_width() * 5.25), int(jugar_img.get_height() * 5.25)))
+
+        if salir_btn.clicked:
+            salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
+        else:
+            salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
+
+        pantalla.fill(MENU)
+        jugar_btn.draw()
+        salir_btn.draw()
+        pygame.display.update()
+
 
 class Jugador(pygame.sprite.Sprite):
     def __init__(self, x, y, velocity_x, velocity_y):
@@ -212,13 +338,7 @@ def actualizar_puntuacion():
     pantalla.blit(puntuacion_texto, puntuacion_rect.topleft)
 
 
-pygame.init()
-screen_width = 1200
-screen_height = 900
-pantalla = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("¡Corre Paco corre!")
 jugador = Jugador(320, 240, 0, 0)
-
 enemigos = pygame.sprite.Group()  
 
 run = True
@@ -257,7 +377,7 @@ class Estructura(pygame.sprite.Sprite):
                 self.rect.y = screen_height- self.rect.height - 100
             elif stucture_sel==2:
                 self.rect.y = 720 - self.rect.height
-            self.velocity += 1
+            self.velocity += 0.25
                 
 
 estructuras = pygame.sprite.Group()
@@ -299,11 +419,13 @@ def mostrar_mensaje_muerte(surface):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 muerto = False
 
+
 while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
 
+    if juego_activo:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
                 jugador.salto()
@@ -319,7 +441,7 @@ while run:
             if event.key == pygame.K_DOWN:
                 jugador.levantarse() 
                 print("levantado") 
-            if event.key == pygame. K_SPACE:
+            if event.key == pygame.K_SPACE:
                 jugador.detener_ataque()
 
         if jugador.attack_rect:
@@ -329,57 +451,68 @@ while run:
                     puntuacion += 5  # Suma 10 puntos
                     print("¡Enemigo derrotado!")
 
-    choque = pygame.sprite.spritecollide(jugador, estructuras, False)
-    if choque:
-        estructura_colisionada = choque[0]  # Obtén la primera estructura con la que ha colisionado
-        if jugador.rect.right > estructura_colisionada.rect.left:
-            jugador.rect.right = estructura_colisionada.rect.left
+        colisiones = pygame.sprite.spritecollide(jugador, enemigos, False)
+        if colisiones:
+            if not jugador.is_atacando:
+                jugador.vida -= 1  # -1 vida si toca enemigo
+                print(f"¡El jugador perdió 1 vida! Vidas restantes: {jugador.vida}")
+            for enemigo in colisiones:
+                enemigo.derrotado = True
 
-    if jugador.rect.right < 0:
-        print("¡Juego terminado! Se salio de la pantalla.")
-        pantalla.fill(BLACK)
-        mostrar_mensaje_muerte(pantalla)
+        choque = pygame.sprite.spritecollide(jugador, estructuras, False)
+        if choque:
+            estructura_colisionada = choque[0]  # Obtén la primera estructura con la que ha colisionado
+            if jugador.rect.right > estructura_colisionada.rect.left:
+                jugador.rect.right = estructura_colisionada.rect.left
 
-    colisiones = pygame.sprite.spritecollide(jugador, enemigos, False)
-    if colisiones:
-        if not jugador.is_atacando:
-            jugador.vida -= 1  # -1 vida si toca enemigo
-            print(f"¡El jugador perdió 1 vida! Vidas restantes: {jugador.vida}")
-        for enemigo in colisiones:
-            enemigo.derrotado = True
+        if jugador.rect.right < 0:
+            print("¡Juego terminado! Se salió de la pantalla.")
+            juego_activo = False
+            menu_activo = True
 
     # Comprobar si el jugador se queda sin vidas
-    if jugador.vida <= 0:
-        print("¡Juego terminado! El jugador se quedó sin vidas.")
-        pantalla.fill(BLACK)
-        mostrar_mensaje_muerte(pantalla)
-        
+        if jugador.vida <= 0:
+            print("¡Juego terminado! El jugador se quedó sin vidas.")
+            juego_activo = False
+            menu_activo = True
 
-    jugador.update()
-    enemigos.update()
-    estructuras.update()
 
-    current_time = pygame.time.get_ticks()
+        # Mueve la verificación del evento de cerrar la ventana aquí
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
-    # Comprueba si es hora de generar un nuevo enemigo
-    if current_time - spawn_timer > spawn_interval:
-        enemigo = generar_enemigo()
-        enemigos.add(enemigo)
-        spawn_timer = current_time  
+        jugador.update()
+        enemigos.update()
+        estructuras.update()
 
-    pantalla.fill(FONDO)
+        current_time = pygame.time.get_ticks()
 
-    for estructura in estructuras:
-        pygame.draw.rect(pantalla, MARRON, estructura.rect)
+        # Comprueba si es hora de generar un nuevo enemigo
+        if current_time - spawn_timer > spawn_interval:
+            enemigo = generar_enemigo()
+            enemigos.add(enemigo)
+            spawn_timer = current_time  
 
-    jugador.draw(pantalla)
-    enemigos.draw(pantalla)
-    pygame.draw.rect(pantalla, SUELO, pygame.Rect(0, 780, 1200, 500))
+        pantalla.fill(FONDO)
 
-    mostrar_vida(pantalla, jugador.vida)
-    actualizar_puntuacion()
-    pygame.display.update()
-    pygame.display.flip()  # Actualizar la pantalla
-    clock.tick(60)  # Limitar los FPS a 60
+        for estructura in estructuras:
+            pygame.draw.rect(pantalla, MARRON, estructura.rect)
 
+        jugador.draw(pantalla)
+        enemigos.draw(pantalla)
+        pygame.draw.rect(pantalla, SUELO, pygame.Rect(0, 780, 1200, 500))
+
+        mostrar_vida(pantalla, jugador.vida)
+        actualizar_puntuacion()
+        pygame.display.update()
+        pygame.display.flip()  # Actualizar la pantalla
+        clock.tick(60)  # Limitar los FPS a 60
+
+    elif menu_activo:
+        mostrar_menu()
+
+# Mueve la salida del juego fuera del bucle del juego
 pygame.quit()
+sys.exit()
