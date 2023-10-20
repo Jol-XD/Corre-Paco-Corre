@@ -141,11 +141,11 @@ class EnemigoNormal(Enemigo):
         self.last_aparicion_time = pygame.time.get_ticks()
         self.derrotado = False
 
-class EnemigoEnano(Enemigo):
+class EnemigoEnano(Enemigo): 
     def __init__(self, x, y):
         super().__init__(x, 755)
         self.image = pygame.transform.scale(self.image, (30, 25))
-        self.velocity_x = -3
+        self.velocity_x = -1
         self.rect.y = 755  
         self.image.fill(GREEN)
 
@@ -161,7 +161,7 @@ class EnemigoVolador(Enemigo):
     def __init__(self, x, y):
         super().__init__(x, y)
         self.image = pygame.transform.scale(self.image, (40, 50))
-        self.velocity_x = -2
+        self.velocity_x = -1
         self.image.fill(AZUL)
         
     def reiniciar(self):
