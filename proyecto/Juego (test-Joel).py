@@ -1,8 +1,10 @@
 import random
 import time
 import pygame
+import os
 
-clock = pygame.time.Clock()  
+clock = pygame.time.Clock()
+OFFSET = 10
 
 ROJO = (255, 0, 0)
 VERDE = (28, 121, 28)
@@ -27,6 +29,8 @@ class Jugador(pygame.sprite.Sprite):
         self.is_agachado = False
         self.gravity = 1.1
         self.jump_strength = -20
+        self.image = pygame.image.load(os.path.join("sprites", "pibe_palo.png"))
+        self.mask = pygame.mask.from_surface(self.image)
 
     def update(self):
         self.rect.x += self.velocity[0]
@@ -70,35 +74,53 @@ class Jugador(pygame.sprite.Sprite):
     def draw(self, surface):
         pygame.draw.rect(surface, ROJO, self.rect)
 
-class Estructura(pygame.sprite.Sprite):
-    def __init__(self, x, width, height, velocity):
+#class Estructura(pygame.sprite.Sprite):
+#    def __init__(self, x, width, height, velocity):
+#        super().__init__()
+#        self.rect = pygame.Rect(x, 0, width, height)  
+#        self.velocity = velocity
+#    
+#    def update(self):
+#        self.rect.x -= self.velocity
+#        if self.rect.right < 0:
+#            self.rect.x = SCREEN_WIDTH + 200
+#            stucture_sel = random.randint(1, 2)
+#            if stucture_sel==1:
+#                self.rect.y = SCREEN_HEIGHT - self.rect.height - 100
+#            elif stucture_sel==2:
+#                self.rect.y = 720 - self.rect.height
+#            self.velocity += 1
+                
+class Structure(pygame.sprite.Sprite):
+    def __init__(self, x, y, width, height, velocity):
         super().__init__()
-        self.rect = pygame.Rect(x, 0, width, height)  
+        self.image = pygame.image.load(os.path.join("sprites", "structuras", "structure1(big).png")).convert_alpha()
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y + self.get_height()
         self.velocity = velocity
-    
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def get_height(self):
+        return self.rect.height
+
     def update(self):
         self.rect.x -= self.velocity
         if self.rect.right < 0:
             self.rect.x = SCREEN_WIDTH + 200
-            stucture_sel = random.randint(1, 2)
-            if stucture_sel==1:
-                self.rect.y = SCREEN_HEIGHT - self.rect.height - 100
-            elif stucture_sel==2:
-                self.rect.y = 720 - self.rect.height
             self.velocity += 1
-                
-        
+
 jugador = Jugador(320, 240, 40, 80, 0, 0)
 
 estructuras = pygame.sprite.Group()
 
 for _ in range(1):
-    nueva_estructura = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 120, 10)
+    nueva_estructura = Structure(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 0, 50, 120, 10)
+    nueva_estructura.rect.y = SCREEN_HEIGHT - nueva_estructura.get_height() - 121
     estructuras.add(nueva_estructura)
 
 run = True
 perder = False
-
 
 while run:
     for event in pygame.event.get():
@@ -106,29 +128,38 @@ while run:
             run = False
 
         if event.type == pygame.KEYDOWN:
-             #Si pulsas la flecha arriba sasltas
             if event.key == pygame.K_UP:
                 jugador.salto()
                 print("salto")
-            #Si pulsas la flecha abajo te agachas
             if event.key == pygame.K_DOWN:
                 jugador.agacharse()
                 print("agachado")
 
-        #Si sueltas la flecha abajo te levantas
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_DOWN:
                 jugador.levantarse()
                 print("levantado")
-        
-    choque = pygame.sprite.spritecollide(jugador, estructuras, False)
+
+    # Detección de colisiones
+    # Detección de colisiones
+    choque = pygame.sprite.spritecollide(jugador, estructuras, False, pygame.sprite.collide_mask)
     if choque:
-        estructura_colisionada = choque[0]  # Obtén la primera estructura con la que ha colisionado
-        if jugador.rect.right > estructura_colisionada.rect.left:
-            jugador.rect.right = estructura_colisionada.rect.left
+        estructura_colisionada = choque[0]
+        if jugador.rect.bottom <= estructura_colisionada.rect.top + OFFSET:
+            jugador.rect.bottom = estructura_colisionada.rect.top + OFFSET
+            jugador.velocity[1] = 0
+            is_jumping = False
+        else:
+            # Colisión desde los lados
+            if jugador.rect.left < estructura_colisionada.rect.left:
+                # Colisión desde la izquierda
+                jugador.rect.right = estructura_colisionada.rect.left
+            else:
+                # Colisión desde la derecha
+                jugador.rect.left = estructura_colisionada.rect.right
             
     if jugador.rect.right < 0:
-        run=False
+        run = False
 
     jugador.update()
     estructuras.update()
@@ -136,11 +167,11 @@ while run:
     pantalla.fill(FONDO)
 
     for estructura in estructuras:
-        pygame.draw.rect(pantalla, MARRON, estructura.rect)
+        pantalla.blit(estructura.image, estructura.rect)
 
     jugador.draw(pantalla)
 
-    pygame.draw.rect(pantalla, VERDE, pygame.Rect(0, 780, 1200, 500))
+    pygame.draw.rect(pantalla, VERDE, pygame.Rect(0, 780, 1200, 121))
 
     pygame.display.flip()  # Actualizar la pantalla
     clock.tick(60)  # Limitar los FPS a 60

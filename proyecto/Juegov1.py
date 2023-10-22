@@ -93,7 +93,7 @@ jugador = Jugador(320, 240, 40, 80, 0, 0)
 estructuras = pygame.sprite.Group()
 
 for _ in range(1):
-    nueva_estructura = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 120, 2)
+    nueva_estructura = Estructura(random.randint(SCREEN_WIDTH, SCREEN_WIDTH + 200), 50, 120, 10)
     estructuras.add(nueva_estructura)
 
 run = True
