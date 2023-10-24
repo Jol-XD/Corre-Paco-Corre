@@ -54,8 +54,8 @@ juego_activo = False
 def mostrar_mensaje_salida():
     pantalla.fill((202, 228, 241))
     mensaje = "¿Enserio deseas salir del juego?"
-    font = pygame.font.SysFont("arialblack", 40)
-    draw_text(mensaje, font, (255, 255, 255), 270, 300)
+    font = pygame.font.SysFont("arialblack", 60)
+    draw_text(mensaje, font, (255, 255, 255), 300, 300)
 
 
     while True:
@@ -419,30 +419,52 @@ def mostrar_mensaje_muerte(surface):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 muerto = False
 
+def reiniciar_juego():
+    global juego_activo, puntuacion, tiempo_ultimo_punto
+
+    juego_activo = True
+    puntuacion = 0
+    tiempo_ultimo_punto = 0
+
+    # Restablece la posición del jugador
+    jugador.rect.x = 320
+    jugador.rect.y = 240
+    jugador.velocity = [0, 0]
+    jugador.vida = 5
+
+    # Restablece la posición de las estructuras
+    estructuras.empty()
+    for _ in range(1):
+        nueva_estructura = Estructura(random.randint(screen_width, screen_width + 200), 50, 120, 10)
+        estructuras.add(nueva_estructura)
+
+    # Reinicia el tiempo de aparición de los enemigos
+    spawn_timer = 0
 
 while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
 
-    if juego_activo:
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                jugador.salto()
-                print("salto")
-            if event.key == pygame.K_DOWN:
-                jugador.agacharse()
-                print("agachado")
-            if event.key == pygame.K_SPACE:
-                jugador.atacar()
-                print("ataque")
+        if juego_activo:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    jugador.salto()
+                    print("salto")
+                if event.key == pygame.K_DOWN:
+                    jugador.agacharse()
+                    print("agachado")
+                if event.key == pygame.K_SPACE:
+                    jugador.atacar()
+                    print("ataque")
 
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_DOWN:
-                jugador.levantarse() 
-                print("levantado") 
-            if event.key == pygame.K_SPACE:
-                jugador.detener_ataque()
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_DOWN:
+                    jugador.levantarse() 
+                    print("levantado") 
+                if event.key == pygame.K_SPACE:
+                    jugador.detener_ataque()
+
 
         if jugador.attack_rect:
             for enemigo in enemigos:
@@ -476,12 +498,12 @@ while run:
             juego_activo = False
             menu_activo = True
 
-
         # Mueve la verificación del evento de cerrar la ventana aquí
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
 
         jugador.update()
         enemigos.update()
@@ -510,8 +532,6 @@ while run:
         pygame.display.flip()  # Actualizar la pantalla
         clock.tick(60)  # Limitar los FPS a 60
 
-    elif menu_activo:
-        mostrar_menu()
 
 # Mueve la salida del juego fuera del bucle del juego
 pygame.quit()

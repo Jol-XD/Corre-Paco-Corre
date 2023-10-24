@@ -291,8 +291,6 @@ while run:
             if event.key == pygame. K_SPACE:
                 jugador.detener_ataque()
 
-
-
         if jugador.attack_rect:
             for enemigo in enemigos:
                 if jugador.attack_rect.colliderect(enemigo.rect):
