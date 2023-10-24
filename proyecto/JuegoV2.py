@@ -242,16 +242,19 @@ class jugador(pygame.sprite.Sprite):
         if self.is_atacando and self.attack_rect:
             pygame.draw.rect(surface, ROJO, self.attack_rect)
 
-class Enemigo(pygame.sprite.Sprite):
 
+class EnemigoNormal(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface((40, 80))
+        self.image = pygame.image.load("proyecto/sprites/zombie.png") 
+        self.image = pygame.transform.scale(self.image, (40, 80))
         self.rect = self.image.get_rect()
         self.rect.x = x
-        self.rect.y = y
-        self.velocity_x = -3
-        self.derrotado = False
+        self.rect.y = y 
+        self.velocity_x = -4
+        self.velocidad_inicial = -4
+        self.velocidad = self.velocidad_inicial
+        self.derrotado = False 
 
     def update(self):
         self.rect.x += self.velocity_x
@@ -262,20 +265,33 @@ class Enemigo(pygame.sprite.Sprite):
     def reiniciar(self):
         self.rect.x = screen_width
         self.rect.y = 700
-        self.velocity_x = -3
+        self.velocity_x += -0.25
         self.derrotado = False
 
-class EnemigoNormal(Enemigo):
+class EnemigoVolador(pygame.sprite.Sprite):
     def __init__(self, x, y):
-        super().__init__(x, y)
-        self.image = pygame.transform.scale(self.image, (40, 80))
-        self.image.fill(ROJO)
-        self.velocidad_inicial = -3
+        super().__init__()  # Llama al constructor de la clase base
+        self.image = pygame.image.load("proyecto/sprites/ojo.png") 
+        self.image = pygame.transform.scale(self.image, (70, 50))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.velocity_x = -5 # Asegúrate de que AZUL esté definido en algún lugar de tu código
+        self.velocidad_inicial = -5
         self.velocidad = self.velocidad_inicial
+        self.derrotado = False  # Agregar esta línea para definir derrotado
+
+    def update(self):
+        self.rect.x += self.velocity_x
+
+        if self.rect.right < 0 or self.derrotado:
+            self.reiniciar()
 
     def reiniciar(self):
-        super().reiniciar()
-        self.velocity_x = self.velocidad
+        self.rect.x = screen_width
+        self.rect.y = 700
+        self.velocity_x += -0.25
+        self.derrotado = False
 
 #class EnemigoEnano(Enemigo):
 #    def __init__(self, x, y):
@@ -291,18 +307,6 @@ class EnemigoNormal(Enemigo):
 #        super().reiniciar()
 #        self.velocity_x = self.velocidad
 
-class EnemigoVolador(Enemigo):
-    def __init__(self, x, y,):
-        super().__init__(x, y)
-        self.image = pygame.transform.scale(self.image, (40, 50))
-        self.velocity_x = -5
-        self.image.fill(AZUL)
-        self.velocidad_inicial = -5
-        self.velocidad = self.velocidad_inicial
-    def reiniciar(self):
-        super().reiniciar()
-        self.velocity_x = self.velocidad
-        
 
 jugador = jugador(320, 700, 0, 0)
 enemigos = pygame.sprite.Group()  
