@@ -535,4 +535,3 @@ while run:
         mostrar_menu()
 
 pygame.quit()
-sys.exit()
