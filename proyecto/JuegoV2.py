@@ -93,7 +93,7 @@ def mostrar_menu():
     jugador.rect.x = 320
     jugador.rect.y = 700
     jugador.velocity = [0, 0]
-    jugador.vida = 5
+    jugador.vida = 3
 
     # Restablece la posición de las estructuras
     estructuras.empty()
@@ -106,7 +106,7 @@ def mostrar_menu():
     enemigos.add(nuevo_enemigo)
 
     for _ in range(1):
-        nueva_estructura = Estructura(random.randint(screen_width, screen_width + 200), 50, 120, 10)
+        nueva_estructura = Estructura(random.randint(screen_width, screen_width + 500), 50, 120, 10)
         estructuras.add(nueva_estructura)
 
 
@@ -156,7 +156,7 @@ class jugador(pygame.sprite.Sprite):
         self.is_atacando = False 
         self.gravity = 1.1
         self.jump_strength = -20
-        self.vida = 5
+        self.vida = 3
         self.attack_duration = 200    # Duración del ataque en milisegundos
         self.attack_timer = 0  # Temporizador para controlar la duración del ataque
 
@@ -379,10 +379,6 @@ class Estructura(pygame.sprite.Sprite):
             self.velocity += 0.25
 
 estructuras = pygame.sprite.Group()
-
-for _ in range(1):
-    nueva_estructura = Estructura(random.randint(screen_width, screen_width + 200), 50, 120, 10)
-    estructuras.add(nueva_estructura)
 
 font = pygame.font.Font(None, 36)
 corazon_image = pygame.image.load("proyecto/sprites/cora.png")
