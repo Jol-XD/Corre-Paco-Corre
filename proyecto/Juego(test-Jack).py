@@ -99,6 +99,7 @@ def mostrar_menu():
     # Restablece la posición de las estructuras
     estructuras.empty()
     enemigos.empty()
+    generar_enemigo()
 
 
 
@@ -331,6 +332,8 @@ tipos_enemigos = [(1), (2), (3)]
 
 def generar_enemigo():
     global enemigo_en_pantalla, ultimo_enemigo_derrotado
+
+    enemigos.add(nuevo_enemigo)
 
     if not enemigo_en_pantalla and ultimo_enemigo_derrotado:
         enemigo_en_pantalla = True
