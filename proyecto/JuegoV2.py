@@ -94,7 +94,7 @@ def mostrar_menu():
     jugador.rect.x = 320
     jugador.rect.y = 700
     jugador.velocity = [0, 0]
-    jugador.vida = 1
+    jugador.vida = 3
 
     # Restablece la posición de las estructuras
     estructuras.empty()
@@ -157,7 +157,7 @@ class jugador(pygame.sprite.Sprite):
         self.is_atacando = False 
         self.gravity = 1.1
         self.jump_strength = -20
-        self.vida = 1
+        self.vida = 3
         self.attack_duration = 200    # Duración del ataque en milisegundos
         self.attack_timer = 0  # Temporizador para controlar la duración del ataque
 
