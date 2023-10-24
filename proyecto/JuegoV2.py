@@ -12,6 +12,7 @@ GREEN = (0, 255, 0)
 NEGRO = (0, 0, 0)
 MARRON = (128, 64, 0)
 SUELO = (28, 121, 28)
+BLANCO = (255, 255, 255)
 
 clock = pygame.time.Clock()
 pygame.init()
@@ -100,7 +101,7 @@ def mostrar_menu():
 
     # Agregar un enemigo al principio del juego de manera aleatoria
     enemigos.empty()
-    tipos_enemigos = [EnemigoNormal, EnemigoVolador] #falta EnemigoEnano
+    tipos_enemigos = [EnemigoNormal, EnemigoVolador, EnemigoEnano]
     enemigo_inicial = random.choice(tipos_enemigos)
     nuevo_enemigo = enemigo_inicial(screen_width, 700)
     enemigos.add(nuevo_enemigo)
@@ -242,6 +243,7 @@ class jugador(pygame.sprite.Sprite):
         if self.is_atacando and self.attack_rect:
             pygame.draw.rect(surface, ROJO, self.attack_rect)
 
+import pygame
 
 class EnemigoNormal(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -270,16 +272,16 @@ class EnemigoNormal(pygame.sprite.Sprite):
 
 class EnemigoVolador(pygame.sprite.Sprite):
     def __init__(self, x, y):
-        super().__init__()  # Llama al constructor de la clase base
+        super().__init__() 
         self.image = pygame.image.load("proyecto/sprites/ojo.png") 
         self.image = pygame.transform.scale(self.image, (70, 50))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.velocity_x = -5 # Asegúrate de que AZUL esté definido en algún lugar de tu código
+        self.velocity_x = -5
         self.velocidad_inicial = -5
         self.velocidad = self.velocidad_inicial
-        self.derrotado = False  # Agregar esta línea para definir derrotado
+        self.derrotado = False
 
     def update(self):
         self.rect.x += self.velocity_x
@@ -293,20 +295,30 @@ class EnemigoVolador(pygame.sprite.Sprite):
         self.velocity_x += -0.25
         self.derrotado = False
 
-#class EnemigoEnano(Enemigo):
-#    def __init__(self, x, y):
-#        super().__init__(x, 755)
-#        self.image = pygame.transform.scale(self.image, (30, 25))
-#        self.velocity_x = -6
-#        self.rect.y = 755
-#       self.image.fill(GREEN)
-#        self.velocidad_inicial = -6
-#       self.velocidad = self.velocidad_inicial
+class EnemigoEnano(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.image.load("proyecto/sprites/rata.png") 
+        self.image = pygame.transform.scale(self.image, (30, 25))
+        self.rect = self.image.get_rect()
+        self.velocity_x = -6
+        self.rect.x = x 
+        self.rect.y = 755
+        self.velocidad_inicial = -6
+        self.velocidad = self.velocidad_inicial
+        self.derrotado = False
 
-#    def reiniciar(self):
-#        super().reiniciar()
-#        self.velocity_x = self.velocidad
+    def update(self):
+        self.rect.x += self.velocity_x
 
+        if self.rect.right < 0 or self.derrotado:
+            self.reiniciar()
+
+    def reiniciar(self):
+        self.rect.x = screen_width
+        self.rect.y = 755
+        self.velocity_x += -0.25
+        self.derrotado = False
 
 jugador = jugador(320, 700, 0, 0)
 enemigos = pygame.sprite.Group()  
@@ -314,30 +326,19 @@ spawn_timer = 0
 spawn_interval = 3000 
 enemigo_en_pantalla = False
 enemigo_actual = None
-ultima_clase_enemigo = None
-ultimo_tipo_enemigo = None
 ultimo_enemigo_derrotado = False
 
-
 def generar_enemigo():
-    global enemigo_en_pantalla, ultima_clase_enemigo, ultimo_tipo_enemigo, ultimo_enemigo_derrotado
+    global enemigo_en_pantalla, ultimo_enemigo_derrotado
     if not enemigo_en_pantalla and ultimo_enemigo_derrotado:
         enemigo_en_pantalla = True
-        # Clases de enemigos disponibles
-        clases_enemigos = [EnemigoNormal, EnemigoVolador] #EnemigoEnano falta
 
-        while True:
-            # Elije una clase de enemigo aleatoriamente
-            clase_enemigo = random.choice(clases_enemigos)
+        clases_enemigos = [EnemigoNormal, EnemigoVolador, EnemigoEnano] 
+        clase_enemigo = random.choice(clases_enemigos)
 
-            # Comprueba si el tipo del enemigo es diferente al anterior
-            if clase_enemigo != ultimo_tipo_enemigo:
-                ultimo_tipo_enemigo = clase_enemigo
-                ultima_clase_enemigo = clase_enemigo
-                # Crea un enemigo de la clase elegida
-                enemigo = clase_enemigo(screen_width, 700)
-                return enemigo
-    return None
+        nuevo_enemigo = clase_enemigo(screen_width, 700)
+
+        enemigos.add(nuevo_enemigo)
 
 font = pygame.font.SysFont("arialblack", 40) 
 puntuacion = 0
@@ -399,11 +400,24 @@ def mostrar_vida(surface, vida):
 has_muerto_image = pygame.image.load("proyecto/sprites/has_muerto.png")
 has_muerto_image = pygame.transform.scale(has_muerto_image, (500, 300))
 
+muerto = False
+
+surface = pygame.display.set_mode((screen_width, screen_height ))
+
+# Función para mostrar un mensaje de muerte
 # Función para mostrar un mensaje de muerte
 def mostrar_mensaje_muerte(surface):
     global run
-
-    surface.blit(has_muerto_image, (350, 200))
+    pantalla.fill(NEGRO)
+    surface.blit(has_muerto_image, (350, 80))
+    
+    # Dibujar un mensaje en la pantalla
+    font = pygame.font.Font(None, 36)
+    texto = font.render("Presiona ESC para volver al menú", True, BLANCO)
+    texto_rect = texto.get_rect()
+    texto_rect.topleft = (400, 700)  
+    surface.blit(texto, texto_rect)
+    
     pygame.display.update()
 
     muerto = True
@@ -412,7 +426,7 @@ def mostrar_mensaje_muerte(surface):
             if event.type == pygame.QUIT:
                 run = False
                 muerto = False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 muerto = False
 
 def reiniciar_juego():
@@ -452,13 +466,14 @@ while run:
                 if event.key == pygame.K_SPACE:
                     jugador.detener_ataque()
 
-            if jugador.attack_rect:
-                for enemigo in enemigos:
-                    if jugador.attack_rect.colliderect(enemigo.rect):
-                        enemigo.derrotado = True
-                        puntuacion += 5
-                        print("¡Enemigo derrotado!")
-                        ultimo_enemigo_derrotado = True  # Indicar que el último enemigo fue derrotado
+
+
+        if jugador.attack_rect:
+            for enemigo in enemigos:
+                if jugador.attack_rect.colliderect(enemigo.rect):
+                    enemigo.derrotado = True  # Marcar al enemigo como derrotado en lugar de eliminarlo
+                    puntuacion += 5
+                    print("¡Enemigo derrotado!")
 
     colisiones = pygame.sprite.spritecollide(jugador, enemigos, False)
     if colisiones:
@@ -467,13 +482,11 @@ while run:
             print(f"¡El jugador perdió 1 vida! Vidas restantes: {jugador.vida}")
         for enemigo in colisiones:
             enemigo.derrotado = True
-            puntuacion += 5
             print("¡Enemigo derrotado!")
-            ultimo_enemigo_derrotado = True  # Indicar que el último enemigo fue derrotado
+            ultimo_enemigo_derrotado = True  
 
-    # Restablecer el tipo del último enemigo si se derrotó
-    if ultimo_enemigo_derrotado:
-        ultima_clase_enemigo = None
+    if ultimo_enemigo_derrotado == True:
+        generar_enemigo()
 
     choque = pygame.sprite.spritecollide(jugador, estructuras, False)
     if choque:
@@ -483,28 +496,19 @@ while run:
 
     if jugador.rect.right < 0:
         print("¡Juego terminado! Se salió de la pantalla.")
+        mostrar_mensaje_muerte(surface)
         juego_activo = False
         menu_activo = True
         reiniciar_juego()
 
     if jugador.vida <= 0:
         print("¡Juego terminado! El jugador se quedó sin vidas.")
+        mostrar_mensaje_muerte(surface)
         juego_activo = False
         menu_activo = True
         reiniciar_juego()
 
     jugador.update()
-
-    enemigo_actual = generar_enemigo()  # Generar un nuevo enemigo en cada iteración
-    if enemigo_actual:
-        enemigo_actual.update()
-
-    if not enemigo_en_pantalla and ultimo_enemigo_derrotado:
-        enemigo_actual = generar_enemigo()
-        if enemigo_actual:
-            enemigo_en_pantalla = True
-            ultimo_enemigo_derrotado = False  # Restablecer el valor
-
     enemigos.update()
     estructuras.update()
 

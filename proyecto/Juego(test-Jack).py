@@ -449,13 +449,14 @@ while run:
                 if event.key == pygame.K_SPACE:
                     jugador.detener_ataque()
 
-            if jugador.attack_rect:
-                for enemigo in enemigos:
-                    if jugador.attack_rect.colliderect(enemigo.rect):
-                        enemigo.derrotado = True
-                        puntuacion += 5
-                        print("¡Enemigo derrotado!")
-                        ultimo_enemigo_derrotado = True 
+
+
+        if jugador.attack_rect:
+            for enemigo in enemigos:
+                if jugador.attack_rect.colliderect(enemigo.rect):
+                    enemigo.derrotado = True  # Marcar al enemigo como derrotado en lugar de eliminarlo
+                    puntuacion += 5  # Suma 10 puntos
+                    print("¡Enemigo derrotado!")
 
     colisiones = pygame.sprite.spritecollide(jugador, enemigos, False)
     if colisiones:
