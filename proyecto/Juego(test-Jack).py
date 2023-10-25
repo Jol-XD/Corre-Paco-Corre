@@ -333,6 +333,17 @@ tipos_enemigos = [(1), (2), (3)]
 def generar_enemigo():
     global enemigo_en_pantalla, ultimo_enemigo_derrotado
 
+    numero_enemigo = random.randint(1, 3)
+
+    if numero_enemigo == 1:
+        tipo_enemigo = EnemigoNormal
+    elif numero_enemigo == 2:
+        tipo_enemigo = EnemigoVolador
+    else:
+        tipo_enemigo = EnemigoEnano
+
+    nuevo_enemigo = tipo_enemigo(screen_width, 700)
+    nuevo_enemigo.numero = numero_enemigo  
     enemigos.add(nuevo_enemigo)
 
     if not enemigo_en_pantalla and ultimo_enemigo_derrotado:
