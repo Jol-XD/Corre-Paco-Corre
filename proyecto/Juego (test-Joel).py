@@ -94,7 +94,7 @@ class Jugador(pygame.sprite.Sprite):
 class Structure(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, velocity):
         super().__init__()
-        self.image = pygame.image.load(os.path.join("sprites", "structuras", "structure1(big).png")).convert_alpha()
+        self.image = pygame.image.load(os.path.join("proyecto", "sprites", "structuras", "structure1(big).png")).convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y + self.get_height()
@@ -131,7 +131,7 @@ while run:
             if event.key == pygame.K_UP:
                 jugador.salto()
                 print("salto")
-            if event.key == pygame.K_DOWN:
+            if event.key == pygame.K_DOWN and not jugador.is_jumping:
                 jugador.agacharse()
                 print("agachado")
 

@@ -1,5 +1,6 @@
 import random
 import pygame
+import os
 
 ROJO = (255, 0, 0)
 FONDO = (5, 130, 250)
@@ -16,7 +17,7 @@ class Jugador(pygame.sprite.Sprite):
         # Cargar los cuadros individuales de la animación desde un archivo GIF
         self.animacion = []
         for i in range(1,8):  # Cambia el número según la cantidad de cuadros en tu GIF
-            frame = pygame.image.load(f"proyecto/sprites/corre/corre{i}.PNG")
+            frame = pygame.image.load(os.path.join("proyecto","sprites", "corre", f"corre{i}.PNG"))
             frame = pygame.transform.scale(frame, (100, 120))
             self.animacion.append(frame)
 
