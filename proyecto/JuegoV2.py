@@ -107,7 +107,7 @@ def mostrar_menu():
     enemigos.add(nuevo_enemigo)
 
     for _ in range(1):
-        nueva_estructura = Estructura(random.randint(screen_width, screen_width + 200), 50, 120, 10)
+        nueva_estructura = Estructura(random.randint(screen_width, screen_width + 500), 50, 120, 10)
         estructuras.add(nueva_estructura)
 
 
