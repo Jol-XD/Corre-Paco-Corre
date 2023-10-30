@@ -275,7 +275,7 @@ class EnemigoNormal(pygame.sprite.Sprite):
     def reiniciar(self):
         self.rect.x = screen_width
         self.rect.y = 700
-        self.velocity_x += -0.25
+        self.velocity_x += -5
         self.derrotado = False
 
 class EnemigoVolador(pygame.sprite.Sprite):
@@ -301,7 +301,7 @@ class EnemigoVolador(pygame.sprite.Sprite):
     def reiniciar(self):
         self.rect.x = screen_width
         self.rect.y = 700
-        self.velocity_x += -0.25
+        self.velocity_x += -5
         self.derrotado = False
 
 class EnemigoEnano(pygame.sprite.Sprite):
@@ -327,37 +327,32 @@ class EnemigoEnano(pygame.sprite.Sprite):
     def reiniciar(self):
         self.rect.x = screen_width
         self.rect.y = 755
-        self.velocity_x += -0.25
+        self.velocity_x += -5
         self.derrotado = False
+
+enemigos_derrotados = []
+tiempo_transcurrido = 0
+
 
 jugador = jugador(320, 700, 0, 0)
 enemigos = pygame.sprite.Group()  
 spawn_timer = 0
 spawn_interval = 3000
 
-ultimo_enemigo_derrotado = False
-enemigo_actual = None
-
 def generar_enemigo():
-    global enemigo_actual
+    numero_enemigo = random.randint(1, 3)
 
-    if enemigo_actual is None:
-        numero_enemigo = random.randint(1, 3)  # Elegir un número aleatorio entre 1 y 3
+    if numero_enemigo == 1:
+        tipo_enemigo = EnemigoNormal
+    elif numero_enemigo == 2:
+        tipo_enemigo = EnemigoVolador
+    else:
+        tipo_enemigo = EnemigoEnano
 
-        # Asignar el tipo de enemigo en función del número aleatorio
-        if numero_enemigo == 1:
-            tipo_enemigo = EnemigoNormal
-        elif numero_enemigo == 2:
-            tipo_enemigo = EnemigoVolador
-        else:
-            tipo_enemigo = EnemigoEnano
-
-        nuevo_enemigo = tipo_enemigo(screen_width, 700)
-        nuevo_enemigo.numero = numero_enemigo
-        enemigo_actual = nuevo_enemigo
-        enemigos.add(enemigo_actual)
-
-        print(f"¡Apareció un enemigo número {numero_enemigo}!")
+    nuevo_enemigo = tipo_enemigo(screen_width, 700)
+    nuevo_enemigo.numero = numero_enemigo
+    enemigos.add(nuevo_enemigo)
+    print(f"¡Apareció un enemigo número {numero_enemigo}!")
 
 font = pygame.font.SysFont("arialblack", 40) 
 puntuacion = 0
@@ -464,6 +459,10 @@ def reiniciar_juego():
 
 run = True
 
+# ... (código anterior)
+
+run = True
+
 while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -485,17 +484,12 @@ while run:
                     jugador.detener_ataque()
 
             if jugador.attack_rect:
-                    for enemigo in enemigos:
-                        if jugador.attack_rect.colliderect(enemigo.rect):
-                            puntuacion += 10
-                            print("¡Enemigo derrotado!")
-                            enemigo.derrotado = True
-                            enemigos.remove(enemigo)
-                            ultimo_enemigo_derrotado = True
-
-            if ultimo_enemigo_derrotado:
-                generar_enemigo()
-
+                for enemigo in enemigos:
+                    if jugador.attack_rect.colliderect(enemigo.rect):
+                        puntuacion += 10
+                        enemigos_derrotados.append(enemigo)
+                        print("¡Enemigo derrotado!")
+                        generar_enemigo()
 
     colisiones = pygame.sprite.spritecollide(jugador, enemigos, False)
     if colisiones:
@@ -503,15 +497,12 @@ while run:
             jugador.vida -= 1
             print(f"¡El jugador perdió 1 vida! Vidas restantes: {jugador.vida}")
         for enemigo in colisiones:
-            enemigo.derrotado = True
-            print("¡Enemigo te quito 1 vida!")
-            ultimo_enemigo_derrotado = True  
+            enemigos_derrotados.append(enemigo)
+            print("¡Enemigo derrotado!")
+            generar_enemigo()
 
-    choque = pygame.sprite.spritecollide(jugador, estructuras, False)
-    if choque:
-        estructura_colisionada = choque[0]
-        if jugador.rect.right > estructura_colisionada.rect.left:
-            jugador.rect.right = estructura_colisionada.rect.left
+    for enemigo in enemigos_derrotados:
+        enemigos.remove(enemigo)
 
     if jugador.rect.right < 0:
         print("¡Juego terminado! Se salió de la pantalla.")
@@ -527,13 +518,21 @@ while run:
         menu_activo = True
         reiniciar_juego()
 
+    choque = pygame.sprite.spritecollide(jugador, estructuras, False)
+    if choque:
+        estructura_colisionada = choque[0]
+        if jugador.rect.right > estructura_colisionada.rect.left:
+            jugador.rect.right = estructura_colisionada.rect.left
+
     jugador.update()
     enemigos.update()
     estructuras.update()
 
     current_time = pygame.time.get_ticks()
+    tiempo_transcurrido = current_time
 
-# Aumenta la velocidad de los enemigos en función del tiempo transcurrido
+
+    # Aumenta la velocidad de los enemigos en función del tiempo transcurrido
 
     pantalla.fill(FONDO)
 
@@ -553,4 +552,4 @@ while run:
     if menu_activo:
         mostrar_menu()
 
-pygame.quit()   
+pygame.quit()
