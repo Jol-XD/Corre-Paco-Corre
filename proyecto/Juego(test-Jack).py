@@ -497,7 +497,7 @@ while run:
         if jugador.attack_rect:
             for enemigo in enemigos:
                 if jugador.attack_rect.colliderect(enemigo.rect):
-                    puntuacion += 5
+                    puntuacion += 1
                     print("¡Enemigo derrotado!")
                     enemigo.derrotado = True
                     ultimo_enemigo_derrotado = True  
