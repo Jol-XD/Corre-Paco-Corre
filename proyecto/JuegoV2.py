@@ -259,7 +259,7 @@ class EnemigoNormal(pygame.sprite.Sprite):
         self.derrotado = False 
 
     def update(self):
-        self.rect.x += self.velocity_x
+        self.rect.x += self.velocity_x 
 
         if self.rect.right < 0 or self.derrotado:
             self.reiniciar()
