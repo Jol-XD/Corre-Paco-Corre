@@ -95,19 +95,19 @@ class Structure(pygame.sprite.Sprite):
             self.velocity += 1
 
 class Suelo(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, image):
         super().__init__()
-        self.image = pygame.image.load(os.path.join("proyecto", "sprites", "cesped.png")).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (width, height))
+        self.image = image
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
 
-suelo = Suelo(0, 780, 1200, 121)
+# Crea la instancia de la clase Suelo
+suelo = Suelo(0, SCREEN_HEIGHT - suelo_height, suelo_image)
+
+# Agrégala al grupo de sprites
 todos_los_sprites = pygame.sprite.Group()
 todos_los_sprites.add(suelo)
-
-jugador = Jugador(320, 240, 40, 80, 0, 0)
 
 estructuras = pygame.sprite.Group()
 
