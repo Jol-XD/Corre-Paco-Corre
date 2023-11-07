@@ -422,11 +422,18 @@ def mostrar_mensaje_muerte(surface):
     pantalla.fill(NEGRO)
     surface.blit(has_muerto_image, (350, 80))
     
-    # Dibujar un mensaje en la pantalla
-    font = pygame.font.Font(None, 36)
-    texto = font.render("Presiona ESC para volver al menú", True, BLANCO)
+    # Dibujar la puntuación actual del jugador con fuente Arial Black
+    font = pygame.font.SysFont("arialblack", 40)
+    texto_puntuacion = font.render(f"Puntuación: {puntuacion}", True, BLANCO)
+    texto_puntuacion_rect = texto_puntuacion.get_rect()
+    texto_puntuacion_rect.topleft = (500, 600)  # Ajusta la posición del mensaje de puntuación
+    surface.blit(texto_puntuacion, texto_puntuacion_rect)
+
+    # Dibujar un mensaje en la pantalla con un tamaño de fuente de 50
+    font_mensaje = pygame.font.SysFont("arialblack", 45)
+    texto = font_mensaje.render("Presiona cualquier tecla para volver al menú", True, BLANCO)
     texto_rect = texto.get_rect()
-    texto_rect.topleft = (400, 700)  
+    texto_rect.topleft = (295, 700)  
     surface.blit(texto, texto_rect)
     
     pygame.display.update()
@@ -437,8 +444,11 @@ def mostrar_mensaje_muerte(surface):
             if event.type == pygame.QUIT:
                 run = False
                 muerto = False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            if event.type == pygame.KEYDOWN:
                 muerto = False
+
+
+
 
 def reiniciar_juego():
     global puntuacion
