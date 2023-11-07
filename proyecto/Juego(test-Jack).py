@@ -250,8 +250,6 @@ class jugador(pygame.sprite.Sprite):
         if self.is_atacando and self.attack_rect:
             pygame.draw.rect(surface, ROJO, self.attack_rect)
 
-import pygame
-
 class EnemigoNormal(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -456,10 +454,6 @@ def reiniciar_juego():
     
     # Elimina todos los enemigos
     enemigos.empty()
-
-run = True
-
-# ... (código anterior)
 
 run = True
 
