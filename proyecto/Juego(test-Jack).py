@@ -259,10 +259,34 @@ class Jugador(pygame.sprite.Sprite):
 
 class EnemigoNormal(pygame.sprite.Sprite):
     def __init__(self, x, y):
-        super().__init__()
+        super().__init()
         self.numero = 1
-        self.image = pygame.image.load("proyecto/sprites/zombie.png") 
-        self.image = pygame.transform.scale(self.image, (40, 80))
+        self.en_animacion_previa = True  # Variable para rastrear la animación previa
+        self.animacion_previa = []  # Lista de animaciones previas
+        self.animacion = []  # Lista de la animación principal
+        self.animacion_derrotado = []  # Lista de la animación cuando es derrotado
+
+        # Carga de la animación previa
+        for i in range(1, 6):
+            frame = pygame.image.load(os.path.join("proyecto", "sprites", "esqueleto", "attack", f"attack2_{i}.png"))
+            frame = pygame.transform.scale(frame, (80, 100))
+            self.animacion_previa.append(frame)
+
+        # Carga de la animación principal
+        for i in range(2, 6):
+            frame = pygame.image.load(os.path.join("proyecto", "sprites", "esqueleto", "run", f"run_{i}.png"))
+            frame = pygame.transform.scale(frame, (60, 80))
+            self.animacion.append(frame)
+
+        # Carga de la animación cuando es derrotado
+        for i in range(2, 6):
+            frame = pygame.image.load(os.path.join("proyecto", "sprites", "esqueleto", "muerte", f"muerte_{i}.png"))
+            frame = pygame.transform.scale(frame, (80, 100))
+            self.animacion_derrotado.append(frame)
+
+        self.indice_animacion = 0
+        self.image = self.animacion_previa[self.indice_animacion]  # Inicialmente en la animación previa
+
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y 
@@ -270,8 +294,29 @@ class EnemigoNormal(pygame.sprite.Sprite):
         self.velocidad_inicial = -4
         self.velocidad = self.velocidad_inicial
         self.derrotado = False 
+        self.ultimo_cambio = pygame.time.get_ticks()
+        self.tiempo_animacion = 200
 
     def update(self):
+        tiempo_actual = pygame.time.get_ticks()
+
+        if self.en_animacion_previa and tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
+            self.indice_animacion = (self.indice_animacion + 1) % len(self.animacion_previa)
+            self.image = self.animacion_previa[self.indice_animacion]
+            self.ultimo_cambio = tiempo_actual
+
+            # Cambia a la animación principal después de la animación previa
+            if self.indice_animacion == 0:
+                self.en_animacion_previa = False
+                self.indice_animacion = 0
+                self.image = self.animacion[self.indice_animacion]
+
+        if not self.en_animacion_previa:
+            if tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
+                self.indice_animacion = (self.indice_animacion + 1) % len(self.animacion)
+                self.image = self.animacion[self.indice_animacion]
+                self.ultimo_cambio = tiempo_actual
+
         self.rect.x += self.velocity_x
 
         if self.rect.right < 0 or self.derrotado:
@@ -280,8 +325,13 @@ class EnemigoNormal(pygame.sprite.Sprite):
     def reiniciar(self):
         self.rect.x = screen_width
         self.rect.y = 700
-        self.velocity_x += -5
+        self.velocity_x = self.velocidad_inicial
         self.derrotado = False
+        self.en_animacion_previa = True  # Vuelve a la animación previa
+        self.indice_animacion = 0
+        self.image = self.animacion_previa[self.indice_animacion]
+
+
 
 class EnemigoVolador(pygame.sprite.Sprite):
     def __init__(self, x, y):
