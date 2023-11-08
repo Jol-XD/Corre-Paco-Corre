@@ -2,6 +2,7 @@ import random
 import time
 import pygame
 import sys
+import os
 
 # Define colores
 MENU = (202, 228, 241)
@@ -155,37 +156,41 @@ def mostrar_menu():
         salir_btn.draw()
         pygame.display.update()
 
-class jugador(pygame.sprite.Sprite):
+class Jugador(pygame.sprite.Sprite):
     def __init__(self, x, y, velocity_x, velocity_y):
-        super().__init__()
         self.velocity = [velocity_x, velocity_y]
         self.is_jumping = False
         self.is_agachado = False
-        self.is_atacando = False 
+        self.is_atacando = False
         self.gravity = 1.1
         self.jump_strength = -20
         self.vida = 3
-        self.attack_duration = 200    # Duración del ataque en milisegundos
-        self.attack_timer = 0  # Temporizador para controlar la duración del ataque
+        self.attack_duration = 200
+        self.attack_timer = 0
+        self.ultimo_cambio = pygame.time.get_ticks()
 
-        # Imágenes del jugador
-        self.image_stand = pygame.image.load("proyecto/sprites/pibe_palo.png")
-        self.image_crouch = pygame.image.load("proyecto/sprites/palo_agacha.png")
-        
-        self.image_stand = pygame.transform.scale(self.image_stand, (40, 80))
-        self.image_crouch = pygame.transform.scale(self.image_crouch, (40, 40))
+        self.animacion = []
+        for i in range(1, 8):
+            frame = pygame.image.load(os.path.join("proyecto", "sprites", "corre", f"corre{i}.PNG"))
+            frame = pygame.transform.scale(frame, (70, 100))
+            self.animacion.append(frame)
 
-        self.image = self.image_stand
+        self.indice_animacion = 0
+        self.image = self.animacion[self.indice_animacion]
+
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.tiempo_animacion = 100
 
-        self.attack_rect = None  # Rectángulo de ataque del jugador
+        self.image_crouch = pygame.image.load("proyecto/sprites/palo_agacha.png")
+        self.image_crouch = pygame.transform.scale(self.image_crouch, (40, 40))
+
+        self.attack_rect = None
 
     def update(self):
         self.rect.x += self.velocity[0]
         self.rect.y += self.velocity[1]
-
         self.velocity[1] += self.gravity
 
         if self.velocity[1] > 10:
@@ -203,17 +208,21 @@ class jugador(pygame.sprite.Sprite):
                 self.rect.y = 735
                 self.velocity[1] = 0
 
-        # Actualizar la posición del rectángulo de ataque
         if self.is_atacando:
-            self.attack_rect = pygame.Rect(self.rect.x + 40, self.rect.y + 30, 40, 15)
-            self.attack_timer += pygame.time.get_ticks() - self.last_update_time
-            self.last_update_time = pygame.time.get_ticks()
-            
-            # Si el tiempo de ataque supera la duración, detener el ataque
+            self.attack_rect = pygame.Rect(self.rect.x + 50, self.rect.y + 30, 40, 15)
+            self.attack_timer += pygame.time.get_ticks() - self.ultimo_cambio
+            self.ultimo_cambio = pygame.time.get_ticks()
+
             if self.attack_timer >= self.attack_duration:
                 self.detener_ataque()
         else:
             self.attack_rect = None
+
+        tiempo_actual = pygame.time.get_ticks()
+        if tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
+            self.indice_animacion = (self.indice_animacion + 1) % len(self.animacion)
+            self.image = self.animacion[self.indice_animacion]
+            self.ultimo_cambio = tiempo_actual
 
     def salto(self):
         if not self.is_jumping:
@@ -230,7 +239,6 @@ class jugador(pygame.sprite.Sprite):
     def levantarse(self):
         if self.is_agachado:
             self.is_agachado = False
-            self.image = self.image_stand
             self.rect.height = 80
             self.rect.y -= 0
 
@@ -238,7 +246,7 @@ class jugador(pygame.sprite.Sprite):
         if not self.is_atacando:
             self.is_atacando = True
             self.attack_timer = 0
-            self.last_update_time = pygame.time.get_ticks()
+            self.ultimo_cambio = pygame.time.get_ticks()
 
     def detener_ataque(self):
         self.is_atacando = False
@@ -246,7 +254,6 @@ class jugador(pygame.sprite.Sprite):
     def draw(self, surface):
         surface.blit(self.image, self.rect.topleft)
 
-        # Dibujar el rectángulo de ataque si está activo
         if self.is_atacando and self.attack_rect:
             pygame.draw.rect(surface, ROJO, self.attack_rect)
 
@@ -332,7 +339,7 @@ enemigos_derrotados = []
 tiempo_transcurrido = 0
 
 
-jugador = jugador(320, 700, 0, 0)
+jugador = Jugador(320, 700, 0, 0)
 enemigos = pygame.sprite.Group()  
 spawn_timer = 0
 spawn_interval = 3000
@@ -446,9 +453,6 @@ def mostrar_mensaje_muerte(surface):
                 muerto = False
             if event.type == pygame.KEYDOWN:
                 muerto = False
-
-
-
 
 def reiniciar_juego():
     global puntuacion
