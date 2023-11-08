@@ -366,7 +366,6 @@ class Estructura(pygame.sprite.Sprite):
         super().__init__()
         self.image = sprite_caja2
         self.rect = pygame.Rect(x, 0, width, height)  
-        self.velocity = velocity
     
     def update(self):
         self.rect.x -= self.velocity
