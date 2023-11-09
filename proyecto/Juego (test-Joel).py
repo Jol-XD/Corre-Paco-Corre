@@ -5,7 +5,6 @@ import os
 
 clock = pygame.time.Clock()
 OFFSET = 10
-
 ROJO = (255, 0, 0)
 VERDE = (28, 121, 28)
 AZUL = (0, 0, 255)
@@ -18,6 +17,13 @@ SCREEN_HEIGHT = 900
 pantalla = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("¡Corre Paco corre!")
 
+# Carga la imagen del suelo original
+original_suelo_image = pygame.image.load(os.path.join("proyecto", "sprites", "cesped.png")).convert_alpha()
+
+# Redimensiona la imagen para que tenga el mismo ancho que la pantalla
+suelo_width = SCREEN_WIDTH
+suelo_height = int(original_suelo_image.get_height() * (suelo_width / original_suelo_image.get_width()))
+suelo_image = pygame.transform.scale(original_suelo_image, (suelo_width, suelo_height))
 # Define the player class
 class Jugador(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, velocity_x, velocity_y):
@@ -94,20 +100,11 @@ class Structure(pygame.sprite.Sprite):
             self.rect.x = SCREEN_WIDTH + 200
             self.velocity += 1
 
-class Suelo(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height):
-        super().__init__()
-        self.image = pygame.image.load(os.path.join("proyecto", "sprites", "cesped.png")).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (width, height))
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
 
-suelo = Suelo(0, 780, 1200, 121)
+
+jugador = Jugador(320, 700, 40, 80, 0, 0)
+# Agrégala al grupo de sprites
 todos_los_sprites = pygame.sprite.Group()
-todos_los_sprites.add(suelo)
-
-jugador = Jugador(320, 240, 40, 80, 0, 0)
 
 estructuras = pygame.sprite.Group()
 
