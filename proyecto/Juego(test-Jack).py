@@ -209,7 +209,7 @@ class Jugador(pygame.sprite.Sprite):
                 self.velocity[1] = 0
 
         if self.is_atacando:
-            self.attack_rect = pygame.Rect(self.rect.x + 50, self.rect.y + 30, 40, 15)
+            self.attack_rect = pygame.Rect(self.rect.x + 50, self.rect.y + 30, 50, 15)
             self.attack_timer += pygame.time.get_ticks() - self.ultimo_cambio
             self.ultimo_cambio = pygame.time.get_ticks()
 
@@ -283,22 +283,6 @@ class EnemigoNormal(pygame.sprite.Sprite):
         self.tiempo_animacion = 200
 
     def update(self):
-        self.rect.x += self.velocity_x
-
-        if self.rect.right < 0 or self.derrotado:
-            self.reiniciar()
-
-    def reiniciar(self):
-        self.rect.x = screen_width
-        self.rect.y = 700
-        self.velocity_x = self.velocidad_inicial
-        self.derrotado = False
-        self.indice_animacion = 0
-        self.image = self.animacion[self.indice_animacion]
-
-
-
-    def update(self):
         tiempo_actual = pygame.time.get_ticks()
 
         if tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
@@ -323,17 +307,35 @@ class EnemigoVolador(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.numero = 2, 5
-        self.image = pygame.image.load("proyecto/sprites/ojo.png") 
-        self.image = pygame.transform.scale(self.image, (70, 50))
+        self.animacion = []  # Lista de la animación principal
+
+        # Carga de la animación principal
+        for i in range(1, 8):
+            frame = pygame.image.load(os.path.join("proyecto", "sprites", "vuela_ojo", f"vuelo_{i}.png"))
+            frame = pygame.transform.scale(frame, (70, 60))
+            self.animacion.append(frame)
+
+        self.indice_animacion = 0
+        self.image = self.animacion[self.indice_animacion]  # Inicialmente en la animación principal
+
         self.rect = self.image.get_rect()
         self.rect.x = x
-        self.rect.y = y
+        self.rect.y = 670 
         self.velocity_x = -5
         self.velocidad_inicial = -5
         self.velocidad = self.velocidad_inicial
-        self.derrotado = False
+        self.derrotado = False 
+        self.ultimo_cambio = pygame.time.get_ticks()
+        self.tiempo_animacion = 100
 
     def update(self):
+        tiempo_actual = pygame.time.get_ticks()
+
+        if tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
+            self.indice_animacion = (self.indice_animacion + 1) % len(self.animacion)
+            self.image = self.animacion[self.indice_animacion]
+            self.ultimo_cambio = tiempo_actual
+
         self.rect.x += self.velocity_x
 
         if self.rect.right < 0 or self.derrotado:
@@ -341,9 +343,11 @@ class EnemigoVolador(pygame.sprite.Sprite):
 
     def reiniciar(self):
         self.rect.x = screen_width
-        self.rect.y = 700
-        self.velocity_x += -5
+        self.rect.y = 670
+        self.velocity_x = self.velocidad_inicial
         self.derrotado = False
+        self.indice_animacion = 0
+        self.image = self.animacion[self.indice_animacion]
 
 class EnemigoEnano(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -401,13 +405,20 @@ spawn_timer = 0
 spawn_interval = 3000
 
 def generar_enemigo():
-    numero_enemigo = random.randint(1, 6)
+    numero_enemigo = random.randint(1, 9)
 
-    if numero_enemigo == (1, 4):
+    if numero_enemigo == 1:
         tipo_enemigo = EnemigoNormal
-    elif numero_enemigo == (2, 5):
+    elif numero_enemigo == 2:
         tipo_enemigo = EnemigoVolador
-
+    if numero_enemigo == 4:
+        tipo_enemigo = EnemigoNormal
+    elif numero_enemigo == 5:
+        tipo_enemigo = EnemigoVolador
+    if numero_enemigo == 7:
+        tipo_enemigo = EnemigoNormal
+    elif numero_enemigo == 8:
+        tipo_enemigo = EnemigoVolador
     else:
         tipo_enemigo = EnemigoEnano
 
