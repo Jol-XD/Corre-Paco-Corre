@@ -4,7 +4,7 @@ import pygame
 import os
 
 clock = pygame.time.Clock()
-OFFSET = 10
+OFFSET = 10 
 ROJO = (255, 0, 0)
 VERDE = (28, 121, 28)
 AZUL = (0, 0, 255)
