@@ -2,6 +2,7 @@ import random
 import time
 import pygame
 import sys
+import os
 
 # Define colores
 MENU = (202, 228, 241)
@@ -114,7 +115,7 @@ def mostrar_menu():
     enemigos.add(nuevo_enemigo)
 
     for _ in range(1):
-        nueva_estructura = Estructura(random.randint(screen_width, screen_width + 200), 50, 120, 10)
+        nueva_estructura = Estructura(random.randint(screen_width, screen_width + 200), 500, 120, 10)
         estructuras.add(nueva_estructura)
 
 
@@ -155,37 +156,47 @@ def mostrar_menu():
         salir_btn.draw()
         pygame.display.update()
 
-class jugador(pygame.sprite.Sprite):
+class Jugador(pygame.sprite.Sprite):
     def __init__(self, x, y, velocity_x, velocity_y):
-        super().__init__()
         self.velocity = [velocity_x, velocity_y]
         self.is_jumping = False
         self.is_agachado = False
-        self.is_atacando = False 
+        self.is_atacando = False
         self.gravity = 1.1
         self.jump_strength = -20
         self.vida = 3
-        self.attack_duration = 200    # Duración del ataque en milisegundos
-        self.attack_timer = 0  # Temporizador para controlar la duración del ataque
+        self.attack_duration = 200
+        self.attack_timer = 0
+        self.ultimo_cambio = pygame.time.get_ticks()
 
-        # Imágenes del jugador
-        self.image_stand = pygame.image.load("proyecto/sprites/pibe_palo.png")
-        self.image_crouch = pygame.image.load("proyecto/sprites/palo_agacha.png")
-        
-        self.image_stand = pygame.transform.scale(self.image_stand, (40, 80))
-        self.image_crouch = pygame.transform.scale(self.image_crouch, (40, 40))
+        self.animacion = []
+        for i in range(1, 7):
+            frame = pygame.image.load(os.path.join("proyecto", "sprites", "corre", f"corre{i}.PNG"))
+            frame = pygame.transform.scale(frame, (75, 100))
+            self.animacion.append(frame)
 
-        self.image = self.image_stand
+        self.animacion_salto = []
+        for i in range(1, 7):
+            frame = pygame.image.load(os.path.join("proyecto", "sprites", "salto", f"salto{i}.png"))
+            frame = pygame.transform.scale(frame, (75, 100))
+            self.animacion_salto.append(frame)
+
+        self.indice_animacion = 0
+        self.image = self.animacion[self.indice_animacion]
+
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.tiempo_animacion = 100
 
-        self.attack_rect = None  # Rectángulo de ataque del jugador
+        self.image_crouch = pygame.image.load("proyecto/sprites/palo_agacha.png")
+        self.image_crouch = pygame.transform.scale(self.image_crouch, (40, 40))
+
+        self.attack_rect = None
 
     def update(self):
         self.rect.x += self.velocity[0]
         self.rect.y += self.velocity[1]
-
         self.velocity[1] += self.gravity
 
         if self.velocity[1] > 10:
@@ -194,26 +205,34 @@ class jugador(pygame.sprite.Sprite):
         if not self.is_jumping:
             self.velocity[1] += self.gravity
 
-        if self.rect.y >= 700:
+        if self.rect.y >= 688:
             self.is_jumping = False
             if not self.is_agachado:
-                self.rect.y = 700
+                self.rect.y = 688
                 self.velocity[1] = 0
             else:
                 self.rect.y = 735
                 self.velocity[1] = 0
 
-        # Actualizar la posición del rectángulo de ataque
         if self.is_atacando:
-            self.attack_rect = pygame.Rect(self.rect.x + 40, self.rect.y + 30, 40, 15)
-            self.attack_timer += pygame.time.get_ticks() - self.last_update_time
-            self.last_update_time = pygame.time.get_ticks()
-            
-            # Si el tiempo de ataque supera la duración, detener el ataque
+            self.attack_rect = pygame.Rect(self.rect.x + 50, self.rect.y + 30, 50, 15)
+            self.attack_timer += pygame.time.get_ticks() - self.ultimo_cambio
+            self.ultimo_cambio = pygame.time.get_ticks()
+
             if self.attack_timer >= self.attack_duration:
                 self.detener_ataque()
         else:
             self.attack_rect = None
+        
+        tiempo_actual = pygame.time.get_ticks()
+        if tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
+            self.indice_animacion = (self.indice_animacion + 1) % len(self.animacion)
+            self.image = self.animacion[self.indice_animacion]
+            self.ultimo_cambio = tiempo_actual
+
+        if self.is_jumping:
+            # Cambiar a la animación de salto durante el salto
+            self.image = self.animacion_salto[self.indice_animacion]
 
     def salto(self):
         if not self.is_jumping:
@@ -221,7 +240,7 @@ class jugador(pygame.sprite.Sprite):
             self.velocity[1] = self.jump_strength
 
     def agacharse(self):
-        if not self.is_agachado:
+        if not self.is_agachado and (not self.is_jumping or (self.is_jumping and 650 <= self.rect.y <= 700)):
             self.is_agachado = True
             self.image = self.image_crouch
             self.rect.height = 40
@@ -230,15 +249,14 @@ class jugador(pygame.sprite.Sprite):
     def levantarse(self):
         if self.is_agachado:
             self.is_agachado = False
-            self.image = self.image_stand
             self.rect.height = 80
-            self.rect.y -= 0
+            self.rect.y -= 0 
 
     def atacar(self):
         if not self.is_atacando:
             self.is_atacando = True
             self.attack_timer = 0
-            self.last_update_time = pygame.time.get_ticks()
+            self.ultimo_cambio = pygame.time.get_ticks()
 
     def detener_ataque(self):
         self.is_atacando = False
@@ -246,16 +264,24 @@ class jugador(pygame.sprite.Sprite):
     def draw(self, surface):
         surface.blit(self.image, self.rect.topleft)
 
-        # Dibujar el rectángulo de ataque si está activo
         if self.is_atacando and self.attack_rect:
             pygame.draw.rect(surface, ROJO, self.attack_rect)
 
 class EnemigoNormal(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.numero = 1
-        self.image = pygame.image.load("proyecto/sprites/zombie.png") 
-        self.image = pygame.transform.scale(self.image, (40, 80))
+        self.numero = 1, 4
+        self.animacion = []  # Lista de la animación principal
+
+        # Carga de la animación principal
+        for i in range(2, 6):
+            frame = pygame.image.load(os.path.join("proyecto", "sprites", "esqueleto", "run", f"run_{i}.png"))
+            frame = pygame.transform.scale(frame, (60, 80))
+            self.animacion.append(frame)
+
+        self.indice_animacion = 0
+        self.image = self.animacion[self.indice_animacion]  # Inicialmente en la animación principal
+
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y 
@@ -263,8 +289,17 @@ class EnemigoNormal(pygame.sprite.Sprite):
         self.velocidad_inicial = -4
         self.velocidad = self.velocidad_inicial
         self.derrotado = False 
+        self.ultimo_cambio = pygame.time.get_ticks()
+        self.tiempo_animacion = 200
 
     def update(self):
+        tiempo_actual = pygame.time.get_ticks()
+
+        if tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
+            self.indice_animacion = (self.indice_animacion + 1) % len(self.animacion)
+            self.image = self.animacion[self.indice_animacion]
+            self.ultimo_cambio = tiempo_actual
+
         self.rect.x += self.velocity_x
 
         if self.rect.right < 0 or self.derrotado:
@@ -273,24 +308,44 @@ class EnemigoNormal(pygame.sprite.Sprite):
     def reiniciar(self):
         self.rect.x = screen_width
         self.rect.y = 700
-        self.velocity_x += -5
+        self.velocity_x = self.velocidad_inicial
         self.derrotado = False
+        self.indice_animacion = 0
+        self.image = self.animacion[self.indice_animacion]
 
 class EnemigoVolador(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.numero = 2
-        self.image = pygame.image.load("proyecto/sprites/ojo.png") 
-        self.image = pygame.transform.scale(self.image, (70, 50))
+        self.numero = 2, 5
+        self.animacion = []  # Lista de la animación principal
+
+        # Carga de la animación principal
+        for i in range(1, 8):
+            frame = pygame.image.load(os.path.join("proyecto", "sprites", "vuela_ojo", f"vuelo_{i}.png"))
+            frame = pygame.transform.scale(frame, (70, 60))
+            self.animacion.append(frame)
+
+        self.indice_animacion = 0
+        self.image = self.animacion[self.indice_animacion]  # Inicialmente en la animación principal
+
         self.rect = self.image.get_rect()
         self.rect.x = x
-        self.rect.y = y
+        self.rect.y = 670 
         self.velocity_x = -5
         self.velocidad_inicial = -5
         self.velocidad = self.velocidad_inicial
-        self.derrotado = False
+        self.derrotado = False 
+        self.ultimo_cambio = pygame.time.get_ticks()
+        self.tiempo_animacion = 100
 
     def update(self):
+        tiempo_actual = pygame.time.get_ticks()
+
+        if tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
+            self.indice_animacion = (self.indice_animacion + 1) % len(self.animacion)
+            self.image = self.animacion[self.indice_animacion]
+            self.ultimo_cambio = tiempo_actual
+
         self.rect.x += self.velocity_x
 
         if self.rect.right < 0 or self.derrotado:
@@ -298,25 +353,45 @@ class EnemigoVolador(pygame.sprite.Sprite):
 
     def reiniciar(self):
         self.rect.x = screen_width
-        self.rect.y = 700
-        self.velocity_x += -5
+        self.rect.y = 670
+        self.velocity_x = self.velocidad_inicial
         self.derrotado = False
+        self.indice_animacion = 0
+        self.image = self.animacion[self.indice_animacion]
 
 class EnemigoEnano(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.numero = 3
-        self.image = pygame.image.load("proyecto/sprites/rata.png") 
-        self.image = pygame.transform.scale(self.image, (30, 25))
+        self.numero = 3, 6
+        self.animacion = []  # Lista de la animación principal
+
+        # Carga de la animación principal
+        for i in range(1, 4):
+            frame = pygame.image.load(os.path.join("proyecto", "sprites", "goblin", f"run{i}.png"))
+            frame = pygame.transform.scale(frame, (40, 40))
+            self.animacion.append(frame)
+
+        self.indice_animacion = 0
+        self.image = self.animacion[self.indice_animacion]  # Inicialmente en la animación principal
+
         self.rect = self.image.get_rect()
-        self.velocity_x = -6
         self.rect.x = x 
-        self.rect.y = 755
+        self.rect.y = 740
+        self.velocity_x = -6
         self.velocidad_inicial = -6
         self.velocidad = self.velocidad_inicial
         self.derrotado = False
+        self.ultimo_cambio = pygame.time.get_ticks()
+        self.tiempo_animacion = 100
 
     def update(self):
+        tiempo_actual = pygame.time.get_ticks()
+
+        if tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
+            self.indice_animacion = (self.indice_animacion + 1) % len(self.animacion)
+            self.image = self.animacion[self.indice_animacion]
+            self.ultimo_cambio = tiempo_actual
+
         self.rect.x += self.velocity_x
 
         if self.rect.right < 0 or self.derrotado:
@@ -324,25 +399,35 @@ class EnemigoEnano(pygame.sprite.Sprite):
 
     def reiniciar(self):
         self.rect.x = screen_width
-        self.rect.y = 755
-        self.velocity_x += -5
+        self.rect.y = 740
+        self.velocity_x = self.velocidad_inicial
         self.derrotado = False
+        self.indice_animacion = 0
+        self.image = self.animacion[self.indice_animacion]
 
 enemigos_derrotados = []
 tiempo_transcurrido = 0
 
 
-jugador = jugador(320, 700, 0, 0)
+jugador = Jugador(320, 700, 0, 0)
 enemigos = pygame.sprite.Group()  
 spawn_timer = 0
 spawn_interval = 3000
 
 def generar_enemigo():
-    numero_enemigo = random.randint(1, 3)
+    numero_enemigo = random.randint(1, 9)
 
     if numero_enemigo == 1:
         tipo_enemigo = EnemigoNormal
     elif numero_enemigo == 2:
+        tipo_enemigo = EnemigoVolador
+    if numero_enemigo == 4:
+        tipo_enemigo = EnemigoNormal
+    elif numero_enemigo == 5:
+        tipo_enemigo = EnemigoVolador
+    if numero_enemigo == 7:
+        tipo_enemigo = EnemigoNormal
+    elif numero_enemigo == 8:
         tipo_enemigo = EnemigoVolador
     else:
         tipo_enemigo = EnemigoEnano
@@ -422,11 +507,18 @@ def mostrar_mensaje_muerte(surface):
     pantalla.fill(NEGRO)
     surface.blit(has_muerto_image, (350, 80))
     
-    # Dibujar un mensaje en la pantalla
-    font = pygame.font.Font(None, 36)
-    texto = font.render("Presiona ESC para volver al menú", True, BLANCO)
+    # Dibujar la puntuación actual del jugador con fuente Arial Black
+    font = pygame.font.SysFont("arialblack", 40)
+    texto_puntuacion = font.render(f"Puntuación: {puntuacion}", True, BLANCO)
+    texto_puntuacion_rect = texto_puntuacion.get_rect()
+    texto_puntuacion_rect.topleft = (500, 600)  # Ajusta la posición del mensaje de puntuación
+    surface.blit(texto_puntuacion, texto_puntuacion_rect)
+
+    # Dibujar un mensaje en la pantalla con un tamaño de fuente de 50
+    font_mensaje = pygame.font.SysFont("arialblack", 45)
+    texto = font_mensaje.render("Presiona cualquier tecla para volver al menú", True, BLANCO)
     texto_rect = texto.get_rect()
-    texto_rect.topleft = (400, 700)  
+    texto_rect.topleft = (295, 700)  
     surface.blit(texto, texto_rect)
     
     pygame.display.update()
@@ -437,7 +529,7 @@ def mostrar_mensaje_muerte(surface):
             if event.type == pygame.QUIT:
                 run = False
                 muerto = False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            if event.type == pygame.KEYDOWN:
                 muerto = False
 
 def reiniciar_juego():
@@ -482,7 +574,7 @@ while run:
         if jugador.attack_rect:
             for enemigo in enemigos:
                 if jugador.attack_rect.colliderect(enemigo.rect):
-                    puntuacion += 1
+                    puntuacion += 100
                     print("¡Enemigo derrotado!")
                     enemigo.derrotado = True
                     ultimo_enemigo_derrotado = True  
@@ -494,12 +586,15 @@ while run:
             jugador.vida -= 1
             print(f"¡El jugador perdió 1 vida! Vidas restantes: {jugador.vida}")
         for enemigo in colisiones:
-            enemigos_derrotados.append(enemigo)
-            print("¡Enemigo derrotado!")
-            generar_enemigo()
+            if not enemigo.derrotado:
+                enemigo.derrotado = True
+                enemigos_derrotados.append(enemigo)
+                print("¡Enemigo derrotado!")
+                generar_enemigo()
 
     for enemigo in enemigos_derrotados:
         enemigos.remove(enemigo)
+        
 
     if jugador.rect.right < 0:
         print("¡Juego terminado! Se salió de la pantalla.")
@@ -527,9 +622,6 @@ while run:
 
     current_time = pygame.time.get_ticks()
     tiempo_transcurrido = current_time
-
-
-    # Aumenta la velocidad de los enemigos en función del tiempo transcurrido
 
     pantalla.fill(FONDO)
 
