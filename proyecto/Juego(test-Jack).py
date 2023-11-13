@@ -115,7 +115,7 @@ def mostrar_menu():
     enemigos.add(nuevo_enemigo)
 
     for _ in range(1):
-        nueva_estructura = Estructura(random.randint(screen_width, screen_width + 200), 50, 120, 10)
+        nueva_estructura = Estructura(random.randint(screen_width, screen_width + 200), 500, 120, 10)
         estructuras.add(nueva_estructura)
 
 
@@ -170,10 +170,16 @@ class Jugador(pygame.sprite.Sprite):
         self.ultimo_cambio = pygame.time.get_ticks()
 
         self.animacion = []
-        for i in range(1, 8):
+        for i in range(1, 7):
             frame = pygame.image.load(os.path.join("proyecto", "sprites", "corre", f"corre{i}.PNG"))
             frame = pygame.transform.scale(frame, (75, 100))
             self.animacion.append(frame)
+
+        self.animacion_salto = []
+        for i in range(1, 7):
+            frame = pygame.image.load(os.path.join("proyecto", "sprites", "salto", f"salto{i}.png"))
+            frame = pygame.transform.scale(frame, (75, 100))
+            self.animacion_salto.append(frame)
 
         self.indice_animacion = 0
         self.image = self.animacion[self.indice_animacion]
@@ -217,12 +223,16 @@ class Jugador(pygame.sprite.Sprite):
                 self.detener_ataque()
         else:
             self.attack_rect = None
-
+        
         tiempo_actual = pygame.time.get_ticks()
         if tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
             self.indice_animacion = (self.indice_animacion + 1) % len(self.animacion)
             self.image = self.animacion[self.indice_animacion]
             self.ultimo_cambio = tiempo_actual
+
+        if self.is_jumping:
+            # Cambiar a la animación de salto durante el salto
+            self.image = self.animacion_salto[self.indice_animacion]
 
     def salto(self):
         if not self.is_jumping:
