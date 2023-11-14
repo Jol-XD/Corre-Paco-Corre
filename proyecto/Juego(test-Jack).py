@@ -60,10 +60,10 @@ juego_activo = False
 
 # Función para mostrar un mensaje de salida
 def mostrar_mensaje_salida():
-    pantalla.fill((202, 228, 241))
+    pantalla.fill((201, 228, 241))
     mensaje = "¿Enserio deseas salir del juego?"
-    font = pygame.font.SysFont("arialblack", 40)
-    draw_text(mensaje, font, (255, 255, 255), 270, 300)
+    font = pygame.font.SysFont("arialblack", 50)
+    draw_text(mensaje, font, (255, 255, 255), 315, 300)
 
     while True:
         for event in pygame.event.get():
@@ -115,7 +115,7 @@ def mostrar_menu():
     enemigos.add(nuevo_enemigo)
 
     for _ in range(1):
-        nueva_estructura = Estructura(random.randint(screen_width, screen_width + 200), 500, 120, 10)
+        nueva_estructura = Estructura(random.randint(screen_width, screen_width + 200), 50, 120, 10)
         estructuras.add(nueva_estructura)
 
 
@@ -156,6 +156,28 @@ def mostrar_menu():
         salir_btn.draw()
         pygame.display.update()
 
+def mostrar_menu_pausa():
+    global pausa
+
+    pausa = True
+
+    while pausa:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pausa = False
+
+        pantalla.fill(MENU)
+        # Agrega aquí los elementos específicos del menú de pausa
+        pygame.display.update()
+
+pausa = False
+
+
 class Jugador(pygame.sprite.Sprite):
     def __init__(self, x, y, velocity_x, velocity_y):
         self.velocity = [velocity_x, velocity_y]
@@ -178,7 +200,7 @@ class Jugador(pygame.sprite.Sprite):
         self.animacion_salto = []
         for i in range(1, 7):
             frame = pygame.image.load(os.path.join("proyecto", "sprites", "salto", f"salto{i}.png"))
-            frame = pygame.transform.scale(frame, (75, 100))
+            frame = pygame.transform.scale(frame, (50, 100))
             self.animacion_salto.append(frame)
 
         self.indice_animacion = 0
@@ -215,23 +237,22 @@ class Jugador(pygame.sprite.Sprite):
                 self.velocity[1] = 0
 
         if self.is_atacando:
-            self.attack_rect = pygame.Rect(self.rect.x + 50, self.rect.y + 30, 50, 15)
+            self.attack_rect = pygame.Rect(self.rect.x + 50, self.rect.y + 30, 60, 15)
             self.attack_timer += pygame.time.get_ticks() - self.ultimo_cambio
             self.ultimo_cambio = pygame.time.get_ticks()
 
             if self.attack_timer >= self.attack_duration:
                 self.detener_ataque()
         else:
-            self.attack_rect = None
-        
-        tiempo_actual = pygame.time.get_ticks()
-        if tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
-            self.indice_animacion = (self.indice_animacion + 1) % len(self.animacion)
-            self.image = self.animacion[self.indice_animacion]
-            self.ultimo_cambio = tiempo_actual
+            # Cambiar a la animación de correr solo si no está saltando ni agachado
+            if not self.is_jumping and not self.is_agachado:
+                tiempo_actual = pygame.time.get_ticks()
+                if tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
+                    self.indice_animacion = (self.indice_animacion + 1) % len(self.animacion)
+                    self.image = self.animacion[self.indice_animacion]
+                    self.ultimo_cambio = tiempo_actual
 
         if self.is_jumping:
-            # Cambiar a la animación de salto durante el salto
             self.image = self.animacion_salto[self.indice_animacion]
 
     def salto(self):
@@ -257,9 +278,15 @@ class Jugador(pygame.sprite.Sprite):
             self.is_atacando = True
             self.attack_timer = 0
             self.ultimo_cambio = pygame.time.get_ticks()
+            self.restablecer_animacion()  # Agregado para restablecer la animación al atacar
+
+    def restablecer_animacion(self):
+        self.indice_animacion = 0
+        self.image = self.animacion[self.indice_animacion]
 
     def detener_ataque(self):
         self.is_atacando = False
+        self.restablecer_animacion()
 
     def draw(self, surface):
         surface.blit(self.image, self.rect.topleft)
@@ -330,7 +357,7 @@ class EnemigoVolador(pygame.sprite.Sprite):
 
         self.rect = self.image.get_rect()
         self.rect.x = x
-        self.rect.y = 670 
+        self.rect.y = 680 
         self.velocity_x = -5
         self.velocidad_inicial = -5
         self.velocidad = self.velocidad_inicial
@@ -353,7 +380,7 @@ class EnemigoVolador(pygame.sprite.Sprite):
 
     def reiniciar(self):
         self.rect.x = screen_width
-        self.rect.y = 670
+        self.rect.y = 680
         self.velocity_x = self.velocidad_inicial
         self.derrotado = False
         self.indice_animacion = 0
@@ -556,11 +583,14 @@ while run:
 
         if juego_activo:
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    mostrar_menu_pausa()
+            if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     jugador.salto()
                 if event.key == pygame.K_DOWN:
                     jugador.agacharse()
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_SPACE and not jugador.is_atacando: 
                     jugador.atacar()
 
             if event.type == pygame.KEYUP:
@@ -570,31 +600,29 @@ while run:
                     jugador.detener_ataque()
 
 
+    jugador.update()
+    enemigos.update()
+    estructuras.update()
 
-        if jugador.attack_rect:
-            for enemigo in enemigos:
-                if jugador.attack_rect.colliderect(enemigo.rect):
-                    puntuacion += 100
-                    print("¡Enemigo derrotado!")
-                    enemigo.derrotado = True
-                    ultimo_enemigo_derrotado = True  
-
-
+    # Colisiones y lógica del juego
     colisiones = pygame.sprite.spritecollide(jugador, enemigos, False)
     if colisiones:
-        if not jugador.is_atacando:
-            jugador.vida -= 1
-            print(f"¡El jugador perdió 1 vida! Vidas restantes: {jugador.vida}")
         for enemigo in colisiones:
-            if not enemigo.derrotado:
-                enemigo.derrotado = True
-                enemigos_derrotados.append(enemigo)
-                print("¡Enemigo derrotado!")
-                generar_enemigo()
+            if not jugador.is_atacando:
+                jugador.vida -= 1
+                print(f"¡El jugador perdió 1 vida! Vidas restantes: {jugador.vida}")
+            for enemigo in colisiones:
+                if not enemigo.derrotado:
+                    enemigo.derrotado = True
+                    enemigos_derrotados.append(enemigo)
+                    print("¡Enemigo derrotado!")
+                    generar_enemigo()
 
-    for enemigo in enemigos_derrotados:
-        enemigos.remove(enemigo)
-        
+        # Elimina los enemigos derrotados del grupo de enemigos
+        for enemigo in enemigos_derrotados:
+            enemigos.remove(enemigo)
+
+        enemigos_derrotados = [] 
 
     if jugador.rect.right < 0:
         print("¡Juego terminado! Se salió de la pantalla.")
@@ -615,13 +643,8 @@ while run:
         estructura_colisionada = choque[0]
         if jugador.rect.right > estructura_colisionada.rect.left:
             jugador.rect.right = estructura_colisionada.rect.left
-
-    jugador.update()
-    enemigos.update()
-    estructuras.update()
-
-    current_time = pygame.time.get_ticks()
-    tiempo_transcurrido = current_time
+        elif jugador.rect.left < estructura_colisionada.rect.right:
+            jugador.rect.left = estructura_colisionada.rect.right
 
     pantalla.fill(FONDO)
 
@@ -642,6 +665,3 @@ while run:
         mostrar_menu()
 
 pygame.quit()
-
-
-#a
