@@ -42,16 +42,21 @@ def salir_del_juego():
     pygame.quit()
     sys.exit()
 
-# Carga de imágenes para los botones
-jugar_img = pygame.image.load('proyecto/sprites/JUGAR1.png').convert_alpha()
-jugar_presionado_img = pygame.image.load('proyecto/sprites/jugar02.png').convert_alpha()
-salir_img = pygame.image.load('proyecto/sprites/SALIR1.png').convert_alpha()
-salir_presionado_img = pygame.image.load('proyecto/sprites/salir002.png').convert_alpha()
-No_img = pygame.image.load('proyecto/sprites/no.png').convert_alpha()
-Si_img = pygame.image.load('proyecto/sprites/si.png').convert_alpha()
 
-jugar_btn = Boton(445, 391, jugar_img, 5.25)
-salir_btn = Boton(446, 525, salir_img, 5.25)
+#Titulo
+titulo = pygame.image.load('proyecto/sprites/titulos/nombre13.png').convert_alpha()
+titulo= pygame.transform.scale(titulo, (500, 400))
+
+# Carga de imágenes para los botones
+jugar_img = pygame.image.load('proyecto/sprites/botones/JUGAR1.png').convert_alpha()
+jugar_presionado_img = pygame.image.load('proyecto/sprites/botones/jugar02.png').convert_alpha()
+salir_img = pygame.image.load('proyecto/sprites/botones/SALIR1.png').convert_alpha()
+salir_presionado_img = pygame.image.load('proyecto/sprites/botones/salir002.png').convert_alpha()
+No_img = pygame.image.load('proyecto/sprites/botones/no.png').convert_alpha()
+Si_img = pygame.image.load('proyecto/sprites/botones/si.png').convert_alpha()
+
+jugar_btn = Boton(445, 540, jugar_img, 5.25)
+salir_btn = Boton(446, 670, salir_img, 5.25)
 yes_btn = Boton(350, 400, Si_img, 5.25)
 no_btn = Boton(675, 400, No_img, 5.25)
 
@@ -141,6 +146,7 @@ def mostrar_menu():
                     if mostrar_mensaje_salida():
                         run = False
 
+
         if jugar_btn.clicked:
             jugar_btn.image = pygame.transform.scale(jugar_img, (int(jugar_img.get_width() * 5.25), int(jugar_img.get_height() * 5.25)))
         else:
@@ -152,6 +158,7 @@ def mostrar_menu():
             salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
 
         pantalla.fill(MENU)
+        pantalla.blit(titulo, (350, 50))
         jugar_btn.draw()
         salir_btn.draw()
         pygame.display.update()
@@ -172,7 +179,6 @@ def mostrar_menu_pausa():
                     pausa = False
 
         pantalla.fill(MENU)
-        # Agrega aquí los elementos específicos del menú de pausa
         pygame.display.update()
 
 pausa = False
@@ -215,6 +221,7 @@ class Jugador(pygame.sprite.Sprite):
         self.image_crouch = pygame.transform.scale(self.image_crouch, (40, 40))
 
         self.attack_rect = None
+        
 
     def update(self):
         self.rect.x += self.velocity[0]
@@ -521,7 +528,7 @@ def mostrar_vida(surface, vida):
         surface.blit(corazon_image, (x_corazon, y_corazon))
         x_corazon += 35
 
-has_muerto_image = pygame.image.load("proyecto/sprites/has_muerto.png")
+has_muerto_image = pygame.image.load("proyecto/sprites/titulos/has_muerto.png")
 has_muerto_image = pygame.transform.scale(has_muerto_image, (500, 300))
 
 muerto = False
