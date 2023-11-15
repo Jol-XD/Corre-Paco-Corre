@@ -46,6 +46,8 @@ def salir_del_juego():
 #Titulo
 titulo = pygame.image.load('proyecto/sprites/titulos/nombre13.png').convert_alpha()
 titulo= pygame.transform.scale(titulo, (500, 400))
+titulo2 = pygame.image.load('proyecto/sprites/titulos/nombre12.png').convert_alpha()
+titulo2= pygame.transform.scale(titulo2, (500, 400))
 
 # Carga de imágenes para los botones
 jugar_img = pygame.image.load('proyecto/sprites/botones/JUGAR1.png').convert_alpha()
@@ -168,18 +170,41 @@ def mostrar_menu_pausa():
 
     pausa = True
 
+
     while pausa:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if salir_btn.rect.collidepoint(event.pos):
+                    salir_btn.clicked = True
+
+            if event.type == pygame.MOUSEBUTTONUP:
+                if salir_btn.clicked:
+                    salir_btn.clicked = False
+                    if mostrar_mensaje_salida():
+                        run = False
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     pausa = False
 
+        if salir_btn.clicked:
+            salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
+        else:
+            salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
+
+
         pantalla.fill(MENU)
-        pygame.display.update()
+        pantalla.blit(titulo2, (350, 50))
+        salir_btn.draw()
+        mensaje = "Pulsa Esc para renudar"
+        font = pygame.font.SysFont("arialblack", 50)
+        draw_text(mensaje, font, (255, 255, 255), 410, 600)
+    
+        pygame.display.flip()
 
 pausa = False
 
