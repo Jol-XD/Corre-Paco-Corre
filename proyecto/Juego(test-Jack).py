@@ -304,7 +304,8 @@ class Jugador(pygame.sprite.Sprite):
         self.jump_strength = -20
         self.vida = 3
         self.attack_duration = 200
-        self.attack_timer = 0
+        self.attack_timer = 250
+        self.attack = None
         self.ultimo_cambio = pygame.time.get_ticks()
 
         self.animacion = []
@@ -354,7 +355,6 @@ class Jugador(pygame.sprite.Sprite):
                 self.velocity[1] = 0
 
         if self.is_atacando:
-            self.attack_rect = pygame.Rect(self.rect.x + 50, self.rect.y + 30, 60, 15)
             self.attack_timer += pygame.time.get_ticks() - self.ultimo_cambio
             self.ultimo_cambio = pygame.time.get_ticks()
 
@@ -376,6 +376,9 @@ class Jugador(pygame.sprite.Sprite):
                 self.image = self.animacion_salto[self.indice_animacion]
                 self.ultimo_cambio = tiempo_actual
 
+    def restablecer_animacion(self):
+        self.indice_animacion = 0
+        self.image = self.animacion[self.indice_animacion]
 
     def salto(self):
         if not self.is_jumping:
@@ -400,21 +403,29 @@ class Jugador(pygame.sprite.Sprite):
             self.is_atacando = True
             self.attack_timer = 0
             self.ultimo_cambio = pygame.time.get_ticks()
-            self.restablecer_animacion()  # Agregado para restablecer la animación al atacar
 
-    def restablecer_animacion(self):
-        self.indice_animacion = 0
-        self.image = self.animacion[self.indice_animacion]
+            # Crear una instancia de la clase Attack
+            self.attack = Attack(self.rect.x + 50, self.rect.y + 30)
 
     def detener_ataque(self):
         self.is_atacando = False
         self.restablecer_animacion()
+        self.attack = None  # Limpiar la instancia de ataque
 
     def draw(self, surface):
         surface.blit(self.image, self.rect.topleft)
 
-        if self.is_atacando and self.attack_rect:
-            pygame.draw.rect(surface, ROJO, self.attack_rect)
+        if self.attack:
+            self.attack.draw(surface)
+
+class Attack(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+
+        self.rect = pygame.Rect(x, y, 60, 15)
+
+    def draw(self, surface):
+        pygame.draw.rect(surface, ROJO, self.rect)
 
 class EnemigoNormal(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -759,21 +770,18 @@ while run:
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_DOWN:
                     jugador.levantarse()
-                if event.key == pygame.K_SPACE:
-                    jugador.detener_ataque()
 
     jugador.update()
     enemigos.update()
     estructuras.update()
 
     # Colisiones y lógica del juego
-    colisiones = pygame.sprite.spritecollide(jugador, enemigos, False)
-    if colisiones:
-        for enemigo in colisiones:
-            if not jugador.is_atacando:
-                jugador.vida -= 1
-                print(f"¡El jugador perdió 1 vida! Vidas restantes: {jugador.vida}")
-            for enemigo in colisiones:
+    colisiones_jugador_enemigos = pygame.sprite.spritecollide(jugador, enemigos, False)
+    if colisiones_jugador_enemigos:
+        for enemigo in colisiones_jugador_enemigos:
+            jugador.vida -= 1
+            print(f"¡El jugador perdió 1 vida! Vidas restantes: {jugador.vida}")
+            for enemigo in colisiones_jugador_enemigos:
                 if not enemigo.derrotado:
                     enemigo.derrotado = True
                     enemigos_derrotados.append(enemigo)
@@ -783,6 +791,21 @@ while run:
         # Elimina los enemigos derrotados del grupo de enemigos
         for enemigo in enemigos_derrotados:
             enemigos.remove(enemigo)
+
+    # Colisiones del ataque del jugador con los enemigos
+    if jugador.is_atacando and jugador.attack:
+        colisiones_ataque_enemigos = pygame.sprite.spritecollide(jugador.attack, enemigos, False)
+        if colisiones_ataque_enemigos:
+            for enemigo in colisiones_ataque_enemigos:
+                if not enemigo.derrotado:
+                    enemigo.derrotado = True
+                    enemigos_derrotados.append(enemigo)
+                    print("¡Enemigo derrotado!")
+                    generar_enemigo()
+
+            # Elimina los enemigos derrotados del grupo de enemigos
+            for enemigo in enemigos_derrotados:
+                enemigos.remove(enemigo)
 
         enemigos_derrotados = [] 
 
