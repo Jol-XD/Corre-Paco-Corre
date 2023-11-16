@@ -1,8 +1,8 @@
 import random
-import time
 import pygame
 import sys
 import os
+import math
 
 # Define colores
 MENU = (202, 228, 241)
@@ -90,9 +90,49 @@ def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
     pantalla.blit(img, (x, y))
 
+
+#Background
+
+# Definir las velocidades para cada capa.
+
+speeds = [0.25, 0.35, 0.45, 0.55]
+scrolls = [0] * len(speeds)
+
+bg_images = []
+for i in range(1, 5):
+    bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "Clouds", "Clouds 5", f"{i}.png")).convert_alpha()
+    
+    # Calculate the corresponding width to maintain the aspect ratio
+    aspect_ratio = bg_image.get_width() / bg_image.get_height()
+    bg_width = int(screen_height * aspect_ratio)
+    
+    # Resize the image to the calculated width and screen_height
+    bg_image = pygame.transform.scale(bg_image, (bg_width, screen_height))
+    
+    bg_images.append(bg_image)
+
+bg_width = bg_images[0].get_width()
+
+tiles = math.ceil(screen_width / bg_width) + 1
+
+# Definicion de bg (background)
+def draw_bg():
+    for i, (image, speed) in enumerate(zip(bg_images, speeds)):
+        for x in range(0, tiles):
+            position = (x * bg_width + scrolls[i], 0)
+
+
+            pantalla.blit(image, position)
+
+            # Actualiza el desplazamiento para cada capa.
+            scrolls[i] -= speed
+
+            if abs(scrolls[i]) > bg_width:
+                scrolls[i] = 0
+
 # Función para mostrar el menú principal
 def mostrar_menu():
-    global menu_activo, juego_activo, puntuacion, tiempo_ultimo_punto
+    global menu_activo, juego_activo, puntuacion, tiempo_ultimo_punto, scroll
 
     menu_activo = True
     juego_activo = False
@@ -131,7 +171,6 @@ def mostrar_menu():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if jugar_btn.rect.collidepoint(event.pos):
                     jugar_btn.clicked = True
@@ -158,8 +197,10 @@ def mostrar_menu():
             salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
         else:
             salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
+        
 
-        pantalla.fill(MENU)
+
+        draw_bg()
         pantalla.blit(titulo, (350, 50))
         jugar_btn.draw()
         salir_btn.draw()
