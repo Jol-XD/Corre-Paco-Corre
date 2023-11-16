@@ -94,41 +94,85 @@ def draw_text(text, font, text_col, x, y):
 #Background
 
 # Definir las velocidades para cada capa.
+class Bg_menu1:
+    def __init__(self, screen, screen_width, screen_height):
+        self.screen = screen
+        self.screen_width = screen_width
+        self.screen_height = screen_height
 
-speeds = [0.25, 0.35, 0.45, 0.55]
-scrolls = [0] * len(speeds)
+        self.speeds = [0.5, 0.10, 0.15, 0.20, 0.25]
+        self.scrolls = [0] * len(self.speeds)
 
-bg_images = []
-for i in range(1, 5):
-    bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "Clouds", "Clouds 5", f"{i}.png")).convert_alpha()
-    
-    # Calculate the corresponding width to maintain the aspect ratio
-    aspect_ratio = bg_image.get_width() / bg_image.get_height()
-    bg_width = int(screen_height * aspect_ratio)
-    
-    # Resize the image to the calculated width and screen_height
-    bg_image = pygame.transform.scale(bg_image, (bg_width, screen_height))
-    
-    bg_images.append(bg_image)
+        self.bg_images = []
+        for i in range(1, 5):
+            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_menu", "Clouds 5", f"{i}.png")).convert_alpha()
+            
+            # Calculate the corresponding width to maintain the aspect ratio
+            aspect_ratio = bg_image.get_width() / bg_image.get_height()
+            bg_width = int(self.screen_height * aspect_ratio)
+            
+            # Resize the image to the calculated width and screen_height
+            bg_image = pygame.transform.scale(bg_image, (bg_width, self.screen_height))
+            
+            self.bg_images.append(bg_image)
 
-bg_width = bg_images[0].get_width()
+        self.bg_width = self.bg_images[0].get_width()
 
-tiles = math.ceil(screen_width / bg_width) + 1
+        self.tiles = math.ceil(self.screen_width / self.bg_width) + 1
 
-# Definicion de bg (background)
-def draw_bg():
-    for i, (image, speed) in enumerate(zip(bg_images, speeds)):
-        for x in range(0, tiles):
-            position = (x * bg_width + scrolls[i], 0)
+    def draw_bg(self):
+        for i, (image, speed) in enumerate(zip(self.bg_images, self.speeds)):
+            for x in range(0, self.tiles):
+                position = (x * self.bg_width + self.scrolls[i], 0)
 
+                self.screen.blit(image, position)
 
-            pantalla.blit(image, position)
+                # Actualiza el desplazamiento para cada capa.
+                self.scrolls[i] -= speed
 
-            # Actualiza el desplazamiento para cada capa.
-            scrolls[i] -= speed
+                if abs(self.scrolls[i]) > self.bg_width:
+                    self.scrolls[i] = 0
+bg_m1 = Bg_menu1(pantalla, screen_width, screen_height)
 
-            if abs(scrolls[i]) > bg_width:
-                scrolls[i] = 0
+class Bg_menu2:
+    def __init__(self, screen, screen_width, screen_height):
+        self.screen = screen
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+
+        self.speeds = [0.02, 0.05, 0.08, 0.11]
+        self.scrolls = [0] * len(self.speeds)
+
+        self.bg_images = []
+        for i in range(1, 4):
+            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_menu", "Clouds 3", f"{i}.png")).convert_alpha()
+            
+            # Calculate the corresponding width to maintain the aspect ratio
+            aspect_ratio = bg_image.get_width() / bg_image.get_height()
+            bg_width = int(self.screen_height * aspect_ratio)
+            
+            # Resize the image to the calculated width and screen_height
+            bg_image = pygame.transform.scale(bg_image, (bg_width, self.screen_height))
+            
+            self.bg_images.append(bg_image)
+
+        self.bg_width = self.bg_images[0].get_width()
+
+        self.tiles = math.ceil(self.screen_width / self.bg_width) + 1
+
+    def draw_bg(self):
+        for i, (image, speed) in enumerate(zip(self.bg_images, self.speeds)):
+            for x in range(0, self.tiles):
+                position = (x * self.bg_width + self.scrolls[i], 0)
+
+                self.screen.blit(image, position)
+
+                # Actualiza el desplazamiento para cada capa.
+                self.scrolls[i] -= speed
+
+                if abs(self.scrolls[i]) > self.bg_width:
+                    self.scrolls[i] = 0
+bg_m2 = Bg_menu2(pantalla, screen_width, screen_height)
 
 # Función para mostrar el menú principal
 def mostrar_menu():
@@ -200,7 +244,7 @@ def mostrar_menu():
         
 
 
-        draw_bg()
+        bg_m1.draw_bg()
         pantalla.blit(titulo, (350, 50))
         jugar_btn.draw()
         salir_btn.draw()
@@ -238,7 +282,7 @@ def mostrar_menu_pausa():
             salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
 
 
-        pantalla.fill(MENU)
+        bg_m2.draw_bg()
         pantalla.blit(titulo2, (350, 50))
         salir_btn.draw()
         mensaje = "Pulsa Esc para renudar"
@@ -326,7 +370,12 @@ class Jugador(pygame.sprite.Sprite):
                     self.ultimo_cambio = tiempo_actual
 
         if self.is_jumping:
-            self.image = self.animacion_salto[self.indice_animacion]
+            tiempo_actual = pygame.time.get_ticks()
+            if tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
+                self.indice_animacion = (self.indice_animacion + 1) % len(self.animacion_salto)
+                self.image = self.animacion_salto[self.indice_animacion]
+                self.ultimo_cambio = tiempo_actual
+
 
     def salto(self):
         if not self.is_jumping:
@@ -632,6 +681,47 @@ def mostrar_mensaje_muerte(surface):
             if event.type == pygame.KEYDOWN:
                 muerto = False
 
+class Bg_juego1:
+    def __init__(self, screen, screen_width, screen_height):
+        self.screen = screen
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+
+        self.bg_speed = 1  # Velocidad adicional para el fondo
+
+        self.speeds = [0.25, 0.35, 0.45, 0.55]
+        self.scrolls = [0] * len(self.speeds)
+
+        self.bg_images = []
+        for i in range(1, 4):
+            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_juego", "Ocean_1", f"{i}.png")).convert_alpha()
+
+            aspect_ratio = bg_image.get_width() / bg_image.get_height()
+            bg_width = int(self.screen_height * aspect_ratio)
+
+            bg_image = pygame.transform.scale(bg_image, (bg_width, self.screen_height))
+
+            self.bg_images.append(bg_image)
+
+        self.bg_width = self.bg_images[0].get_width()
+
+        self.tiles = math.ceil(self.screen_width / self.bg_width) + 1
+
+    def draw_bg(self):
+        for x in range(0, self.tiles):
+            for i, (image, speed) in enumerate(zip(self.bg_images, self.speeds)):
+                position = (x * self.bg_width + self.scrolls[i], 0)
+                self.screen.blit(image, position)
+
+                # Actualiza el desplazamiento para cada capa.
+                self.scrolls[i] -= speed
+
+                if abs(self.scrolls[i]) > self.bg_width:
+                    self.scrolls[i] = 0
+
+
+bg1 = Bg_juego1(pantalla, screen_width, screen_height)
+
 def reiniciar_juego():
     global puntuacion
     global tiempo_ultimo_punto
@@ -671,7 +761,6 @@ while run:
                     jugador.levantarse()
                 if event.key == pygame.K_SPACE:
                     jugador.detener_ataque()
-
 
     jugador.update()
     enemigos.update()
@@ -719,14 +808,13 @@ while run:
         elif jugador.rect.left < estructura_colisionada.rect.right:
             jugador.rect.left = estructura_colisionada.rect.right
 
-    pantalla.fill(FONDO)
+    bg1.draw_bg()
 
     for estructura in estructuras:
         pygame.draw.rect(pantalla, MARRON, estructura.rect)
 
     jugador.draw(pantalla)
     enemigos.draw(pantalla)
-    pygame.draw.rect(pantalla, SUELO, pygame.Rect(0, 780, 1200, 500))
 
     mostrar_vida(pantalla, jugador.vida)
     actualizar_puntuacion()
