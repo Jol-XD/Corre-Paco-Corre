@@ -43,7 +43,7 @@ def salir_del_juego():
     sys.exit()
 
 #Titulo
-titulo = pygame.image.load('proyecto/sprites/titulos/nombre13.png').convert_alpha()
+titulo = pygame.image.load('proyecto/sprites/titulos/nombre18.png').convert_alpha()
 titulo= pygame.transform.scale(titulo, (500, 400))
 titulo2 = pygame.image.load('proyecto/sprites/titulos/nombre12.png').convert_alpha()
 titulo2= pygame.transform.scale(titulo2, (500, 400))
