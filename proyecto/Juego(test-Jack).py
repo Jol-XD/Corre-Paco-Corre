@@ -655,7 +655,7 @@ class Estructura1(pygame.sprite.Sprite):
                     self.image = self.image2
                 self.rect.y = screen_height - self.rect.height - 100
             if not self.velocity >= 40:
-                self.velocity += 0.25
+            self.velocity += 0.25
 
         pantalla.blit(self.image, self.rect)
 
