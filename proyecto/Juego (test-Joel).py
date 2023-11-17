@@ -617,14 +617,19 @@ def actualizar_puntuacion():
     puntuacion_rect.topright = (screen_width - 10, 10)
     pantalla.blit(puntuacion_texto, puntuacion_rect.topleft)
 
-sprite_caja2 = pygame.image.load("proyecto/sprites/structuras/cajas-a.png").convert_alpha()
+sprite_caja1 = pygame.image.load("proyecto/sprites/structuras/cajas-a.png").convert_alpha()
+sprite_caja2 = pygame.image.load("proyecto/sprites/structuras/cajas-p.png").convert_alpha()
 class Estructura1(pygame.sprite.Sprite):
     def __init__(self, x, width, height, velocity):
         super().__init__()
-        self.image = pygame.image.load("proyecto/sprites/structuras/cajas-a.png").convert_alpha()  # Cambia "ruta_de_tu_textura.jpg" con la ruta de tu textura
-        self.image = pygame.transform.scale(self.image, (width, height))
+        self.image1 = pygame.image.load("proyecto/sprites/structuras/cajas-a.png").convert_alpha()  # Cambia "ruta_de_tu_textura.jpg" con la ruta de tu textura
+        self.image1 = pygame.transform.scale(self.image1, (width, height))
+        self.image2 = pygame.image.load("proyecto/sprites/structuras/cajas-p.png").convert_alpha()  # Cambia "ruta_de_tu_textura.jpg" con la ruta de tu textura
+        self.image2 = pygame.transform.scale(self.image2, (width, height))
+        self.image = self.image1
         self.rect = self.image.get_rect(topleft=(x, 0))
         self.velocity = velocity
+        self.structure_sel = None
 
     def update(self):
         global screen_width
@@ -632,36 +637,46 @@ class Estructura1(pygame.sprite.Sprite):
         self.rect.x -= self.velocity
         if self.rect.right < 0:
             self.rect.x = screen_width + 200
-            stucture_sel = random.randint(1, 2)
-            if stucture_sel == 1:
+            self.structure_sel = random.randint(1, 3)
+            if self.structure_sel == 1:
+                if self.image == self.image2:
+                    self.image = self.image1
                 self.rect.y = screen_height - self.rect.height - 100
-            elif stucture_sel == 2:
+            elif self.structure_sel == 2:
+                if self.image == self.image2:
+                    self.image = self.image1
                 self.rect.y = 720 - self.rect.height
+            elif self.structure_sel == 3:
+                if self.image == self.image1:
+                    self.image = self.image2
+                self.rect.y = screen_height - self.rect.height - 100
             self.velocity += 0.25
 
         pantalla.blit(self.image, self.rect)
+
+estructure = Estructura1(x=100, width=50, height=50, velocity=5)
 
 estructura1 = pygame.sprite.Group()
 
-class Estructura2(pygame.sprite.Sprite):
-    def __init__(self, x, width, height, velocity):
-        super().__init__()
-        self.image = pygame.image.load("proyecto/sprites/structuras/cajas-p.png").convert_alpha()  # Cambia "ruta_de_tu_textura.jpg" con la ruta de tu textura
-        self.image = pygame.transform.scale(self.image, (width, height))
-        self.rect = self.image.get_rect(topleft=(x, 0))
-        self.velocity = velocity
-
-    def update(self):
-        global screen_width
-        screen_width = pantalla.get_width()
-        self.rect.x -= self.velocity
-        if self.rect.right < 0:
-            self.rect.x = screen_width + 200
-            self.rect.y = screen_height - self.rect.height - 100
-            
-            self.velocity += 0.25
-
-        pantalla.blit(self.image, self.rect)
+#class Estructura2(pygame.sprite.Sprite):
+#    def __init__(self, x, width, height, velocity):
+#        super().__init__()
+#        self.image = pygame.image.load("proyecto/sprites/structuras/cajas-p.png").convert_alpha()  # Cambia "ruta_de_tu_textura.jpg" con la ruta de tu textura
+#        self.image = pygame.transform.scale(self.image, (width, height))
+#        self.rect = self.image.get_rect(topleft=(x, 0))
+#        self.velocity = velocity
+#
+#    def update(self):
+#        global screen_width
+#        screen_width = pantalla.get_width()
+#        self.rect.x -= self.velocity
+#        if self.rect.right < 0:
+#            self.rect.x = screen_width + 200
+#            self.rect.y = screen_height - self.rect.height - 100
+#            
+#            self.velocity += 0.25
+#
+#        pantalla.blit(self.image, self.rect)
         
 
 font = pygame.font.Font(None, 36)
@@ -799,11 +814,7 @@ while run:
 
     jugador.update()
     enemigos.update()
-    estructura_selecionada = random.randint(1, 3)
-    if estructura_selecionada == 1 or 2:
-        estructura1.update()
-    elif estructura_selecionada == 3:
-        estructura2.update()
+    estructura1.update()
 
     # Colisiones y lógica del juego
     colisiones_jugador_enemigos = pygame.sprite.spritecollide(jugador, enemigos, False)
@@ -856,7 +867,9 @@ while run:
     choque = pygame.sprite.spritecollide(jugador, estructura1, False)
     if choque:
         estructura_colisionada = choque[0]
-        if jugador.rect.right > estructura_colisionada.rect.left:
+        if estructura_colisionada.structure_sel == 3:
+            jugador.vida -= 3
+        elif jugador.rect.right > estructura_colisionada.rect.left:
             jugador.rect.right = estructura_colisionada.rect.left
         elif jugador.rect.left < estructura_colisionada.rect.right:
             jugador.rect.left = estructura_colisionada.rect.right
