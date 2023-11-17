@@ -44,9 +44,9 @@ def salir_del_juego():
 
 
 #Titulo
-titulo = pygame.image.load('proyecto/sprites/titulos/nombre13.png').convert_alpha()
+titulo = pygame.image.load('proyecto/sprites/titulos/nombre18.png').convert_alpha()
 titulo= pygame.transform.scale(titulo, (500, 400))
-titulo2 = pygame.image.load('proyecto/sprites/titulos/nombre12.png').convert_alpha()
+titulo2 = pygame.image.load('proyecto/sprites/titulos/nombre20.png').convert_alpha()
 titulo2= pygame.transform.scale(titulo2, (500, 400))
 
 # Carga de imágenes para los botones
@@ -54,11 +54,14 @@ jugar_img = pygame.image.load('proyecto/sprites/botones/JUGAR1.png').convert_alp
 jugar_presionado_img = pygame.image.load('proyecto/sprites/botones/jugar02.png').convert_alpha()
 salir_img = pygame.image.load('proyecto/sprites/botones/SALIR1.png').convert_alpha()
 salir_presionado_img = pygame.image.load('proyecto/sprites/botones/salir002.png').convert_alpha()
+salir_img2 = pygame.image.load('proyecto/sprites/botones/salirnoche.png').convert_alpha()
+salir_presionado_img2 = pygame.image.load('proyecto/sprites/botones/salirnoche0.png').convert_alpha()
 No_img = pygame.image.load('proyecto/sprites/botones/no.png').convert_alpha()
 Si_img = pygame.image.load('proyecto/sprites/botones/si.png').convert_alpha()
 
 jugar_btn = Boton(445, 540, jugar_img, 5.25)
 salir_btn = Boton(446, 670, salir_img, 5.25)
+salir_btn2 = Boton(446, 670, salir_img2, 5.25)
 yes_btn = Boton(350, 400, Si_img, 5.25)
 no_btn = Boton(675, 400, No_img, 5.25)
 
@@ -215,8 +218,10 @@ def mostrar_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if jugar_btn.rect.collidepoint(event.pos):
                     jugar_btn.clicked = True
+                    jugar_btn.image = pygame.transform.scale(jugar_presionado_img, (int(jugar_presionado_img.get_width() * 5.25), int(jugar_presionado_img.get_height() * 5.25)))
                 if salir_btn.rect.collidepoint(event.pos):
                     salir_btn.clicked = True
+                    salir_btn.image = pygame.transform.scale(salir_presionado_img, (int(salir_presionado_img.get_width() * 5.25), int(salir_presionado_img.get_height() * 5.25)))
 
             if event.type == pygame.MOUSEBUTTONUP:
                 if jugar_btn.clicked:
@@ -224,24 +229,21 @@ def mostrar_menu():
                     juego_activo = True
                     jugar_btn.clicked = False
                     cambiar_fondo_aleatorio()
+                    jugar_btn.image = pygame.transform.scale(jugar_img, (int(jugar_img.get_width() * 5.25), int(jugar_img.get_height() * 5.25)))
                 if salir_btn.clicked:
                     salir_btn.clicked = False
                     if mostrar_mensaje_salida():
                         run = False
+                        salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
 
-
-        if jugar_btn.clicked:
-            jugar_btn.image = pygame.transform.scale(jugar_img, (int(jugar_img.get_width() * 5.25), int(jugar_img.get_height() * 5.25)))
-        else:
-            jugar_btn.image = pygame.transform.scale(jugar_img, (int(jugar_img.get_width() * 5.25), int(jugar_img.get_height() * 5.25)))
-
-        if salir_btn.clicked:
-            salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
-        else:
-            salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
-        
-
-
+            if event.type == pygame.MOUSEMOTION:
+                # Restablecer el estado del botón si el mouse se mueve fuera del botón
+                if not salir_btn.rect.collidepoint(event.pos):
+                    salir_btn.clicked = False
+                    salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
+                if not jugar_btn.rect.collidepoint(event.pos):
+                    jugar_btn.clicked = False
+                    jugar_btn.image = pygame.transform.scale(jugar_img, (int(jugar_img.get_width() * 5.25), int(jugar_img.get_height() * 5.25)))
         bg_m1.draw_bg()
         pantalla.blit(titulo, (350, 50))
         jugar_btn.draw()
@@ -303,7 +305,10 @@ class Jugador(pygame.sprite.Sprite):
         self.attack_duration = 200
         self.attack_timer = 250
         self.attack = None
+        self.space_pressed = False
+        self.animacion_ataque_terminada = True
         self.ultimo_cambio = pygame.time.get_ticks()
+        self.attack_start_time = 0
 
         self.animacion = []
         for i in range(1, 7):
@@ -331,13 +336,24 @@ class Jugador(pygame.sprite.Sprite):
         self.rect.y = y
         self.tiempo_animacion = 100
 
-        self.attack_rect = None
-        
+    def cambiar_animacion_ataque(self):
+        if not self.is_atacando and not self.is_jumping and not self.is_agachado:
+            self.space_pressed = True
+            self.animacion_ataque_terminada = False
+            self.atacar()
+
+    def detener_ataque(self):
+        if self.is_atacando:
+            self.is_atacando = False
+            self.restablecer_animacion()
+            self.attack = None  # Limpiar la instancia de ataque
+            self.animacion_ataque_terminada = True
 
     def update(self):
         self.rect.x += self.velocity[0]
         self.rect.y += self.velocity[1]
         self.velocity[1] += self.gravity
+
 
         if self.velocity[1] > 10:
             self.velocity[1] = 10
@@ -415,15 +431,40 @@ class Jugador(pygame.sprite.Sprite):
         if not self.is_atacando:
             self.is_atacando = True
             self.attack_timer = 0
-            self.ultimo_cambio = pygame.time.get_ticks()
+            self.attack_start_time = pygame.time.get_ticks()
 
             # Crear una instancia de la clase Attack
-            self.attack = Attack(self.rect.x + 50, self.rect.y + 30)
+            self.attack = Attack(self.rect.x + 50, self.rect.y + 20)
+
+
+    def restablecer_animacion(self):
+        if not self.is_jumping and not self.is_agachado:
+            # Restablecer la animación original de correr
+            self.animacion = []
+            for i in range(1, 7):
+                frame = pygame.image.load(os.path.join("proyecto", "sprites", "corre", f"corre{i}.PNG"))
+                frame = pygame.transform.scale(frame, (75, 100))
+                self.animacion.append(frame)
+
 
     def detener_ataque(self):
-        self.is_atacando = False
-        self.restablecer_animacion()
-        self.attack = None  # Limpiar la instancia de ataque
+            if self.is_atacando:
+                self.is_atacando = False
+                self.attack = None  # Limpiar la instancia de ataque
+                self.animacion_ataque_terminada = True
+
+                # Switch back to the running animation
+                self.animacion = []
+                for i in range(1, 7):
+                    frame = pygame.image.load(os.path.join("proyecto", "sprites", "corre", f"corre{i}.PNG"))
+                    frame = pygame.transform.scale(frame, (75, 100))
+                    self.animacion.append(frame)
+
+                # Set the current frame to the one where the attack animation left off
+                elapsed_time = pygame.time.get_ticks() - self.attack_start_time
+                frames_per_attack = 8  # Assuming 8 frames in the attack animation
+                self.indice_animacion = (elapsed_time // self.tiempo_animacion) % frames_per_attack
+                self.image = self.animacion[self.indice_animacion]
 
     def draw(self, surface):
         surface.blit(self.image, self.rect.topleft)
@@ -432,13 +473,20 @@ class Jugador(pygame.sprite.Sprite):
             self.attack.draw(surface)
 
 class Attack(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, width=60, height=50):
         super().__init__()
 
-        self.rect = pygame.Rect(x, y, 60, 15)
+        # Carga la imagen
+        original_image = pygame.image.load('proyecto/sprites/atack/atack.png')  # Ajusta la ruta de la imagen
+
+        # Escala la imagen al tamaño deseado
+        self.image = pygame.transform.scale(original_image, (width, height))
+
+        self.rect = self.image.get_rect(topleft=(x, y))
 
     def draw(self, surface):
-        pygame.draw.rect(surface, ROJO, self.rect)
+        # Dibuja la imagen en la superficie
+        surface.blit(self.image, self.rect.topleft)
 
 vel_enemigos = -2 
 
@@ -1038,13 +1086,14 @@ def cambiar_fondo_aleatorio():
     print(f"Fondo cambiado a: {current_bg}")
 
 def reiniciar_juego():
-    global puntuacion, tiempo_ultimo_punto, juego_activo, menu_activo, scrolls
+    global puntuacion, tiempo_ultimo_punto, juego_activo, menu_activo, scrolls, vel_enemigos
     # Reinicia las variables globales
     puntuacion = 0
     tiempo_ultimo_punto = pygame.time.get_ticks()
     juego_activo = False
     menu_activo = True
     scrolls = 0
+    vel_enemigos = -2
 
     # Elimina todos los enemigos
     enemigos.empty()
@@ -1095,7 +1144,7 @@ while run:
     colisiones_jugador_enemigos = pygame.sprite.spritecollide(jugador, enemigos, False)
     if colisiones_jugador_enemigos:
         for enemigo in colisiones_jugador_enemigos:
-            jugador.vida += 1
+            jugador.vida -= 1
             print(f"¡El jugador perdió 1 vida! Vidas restantes: {jugador.vida}")
             for enemigo in colisiones_jugador_enemigos:
                 if not enemigo.derrotado:
