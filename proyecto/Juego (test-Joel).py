@@ -427,6 +427,8 @@ class Attack(pygame.sprite.Sprite):
     def draw(self, surface):
         pygame.draw.rect(surface, ROJO, self.rect)
 
+vel_enemigos = -2 
+
 class EnemigoNormal(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -445,8 +447,8 @@ class EnemigoNormal(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y 
-        self.velocity_x = -4
-        self.velocidad_inicial = -4
+        self.velocidad_inicial = vel_enemigos
+        self.velocity_x = self.velocidad_inicial
         self.velocidad = self.velocidad_inicial
         self.derrotado = False 
         self.ultimo_cambio = pygame.time.get_ticks()
@@ -491,8 +493,8 @@ class EnemigoVolador(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = 680 
-        self.velocity_x = -5
-        self.velocidad_inicial = -5
+        self.velocidad_inicial = vel_enemigos - 1
+        self.velocity_x = self.velocidad_inicial
         self.velocidad = self.velocidad_inicial
         self.derrotado = False 
         self.ultimo_cambio = pygame.time.get_ticks()
@@ -537,8 +539,8 @@ class EnemigoEnano(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x 
         self.rect.y = 740
-        self.velocity_x = -6
-        self.velocidad_inicial = -6
+        self.velocidad_inicial = vel_enemigos -2
+        self.velocity_x = self.velocidad_inicial
         self.velocidad = self.velocidad_inicial
         self.derrotado = False
         self.ultimo_cambio = pygame.time.get_ticks()
@@ -575,6 +577,7 @@ spawn_timer = 0
 spawn_interval = 3000
 
 def generar_enemigo():
+    global vel_enemigos
     numero_enemigo = random.randint(1, 9)
 
     if numero_enemigo == 1:
@@ -591,7 +594,8 @@ def generar_enemigo():
         tipo_enemigo = EnemigoVolador
     else:
         tipo_enemigo = EnemigoEnano
-
+    if not vel_enemigos >= 45:
+        vel_enemigos -= 0.5
     nuevo_enemigo = tipo_enemigo(screen_width, 700)
     nuevo_enemigo.numero = numero_enemigo
     enemigos.add(nuevo_enemigo)
@@ -650,7 +654,7 @@ class Estructura1(pygame.sprite.Sprite):
                 if self.image == self.image1:
                     self.image = self.image2
                 self.rect.y = screen_height - self.rect.height - 100
-            if not self.velocity >= 40:
+            if not self.velocity >= 60:
                 self.velocity += 0.25
 
         pantalla.blit(self.image, self.rect)
@@ -759,12 +763,14 @@ def reiniciar_juego():
     global tiempo_ultimo_punto
     global juego_activo
     global menu_activo
+    global vel_enemigos
 
     # Reinicia las variables globales
     puntuacion = 0
     tiempo_ultimo_punto = pygame.time.get_ticks()
     juego_activo = False
     menu_activo = True
+    vel_enemigos = 0.25
     
     # Elimina todos los enemigos
     enemigos.empty()
