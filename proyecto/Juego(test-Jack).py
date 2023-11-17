@@ -42,7 +42,6 @@ def salir_del_juego():
     pygame.quit()
     sys.exit()
 
-
 #Titulo
 titulo = pygame.image.load('proyecto/sprites/titulos/nombre13.png').convert_alpha()
 titulo= pygame.transform.scale(titulo, (500, 400))
@@ -409,7 +408,6 @@ class Jugador(pygame.sprite.Sprite):
             self.is_agachado = False
             self.rect.height = 80
             self.rect.y -= 0
-            self.restablecer_animacion()
 
     def atacar(self):
         if not self.is_atacando:
@@ -422,7 +420,6 @@ class Jugador(pygame.sprite.Sprite):
 
     def detener_ataque(self):
         self.is_atacando = False
-        self.restablecer_animacion()
         self.attack = None  # Limpiar la instancia de ataque
 
     def draw(self, surface):
