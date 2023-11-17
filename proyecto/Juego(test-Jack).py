@@ -223,6 +223,7 @@ def mostrar_menu():
                     menu_activo = False
                     juego_activo = True
                     jugar_btn.clicked = False
+                    cambiar_fondo_aleatorio()
                 if salir_btn.clicked:
                     salir_btn.clicked = False
                     if mostrar_mensaje_salida():
@@ -473,6 +474,8 @@ class EnemigoNormal(pygame.sprite.Sprite):
             self.ultimo_cambio = tiempo_actual
 
         self.rect.x += self.velocity_x
+        if not self.velocity_x >= 40:
+            self.velocity_x -= 0.15
 
     def reiniciar(self):
         self.rect.x = screen_width
@@ -516,7 +519,8 @@ class EnemigoVolador(pygame.sprite.Sprite):
             self.ultimo_cambio = tiempo_actual
 
         self.rect.x += self.velocity_x
-
+        if not self.velocity_x >= 40:
+            self.velocity_x -= 0.15
     def reiniciar(self):
         self.rect.x = screen_width
         self.rect.y = 680
@@ -559,6 +563,8 @@ class EnemigoEnano(pygame.sprite.Sprite):
             self.ultimo_cambio = tiempo_actual
 
         self.rect.x += self.velocity_x
+        if not self.velocity_x >= 40:
+            self.velocity_x -= 0.15
 
     def reiniciar(self):
         self.rect.x = screen_width
@@ -655,8 +661,7 @@ class Estructura1(pygame.sprite.Sprite):
                     self.image = self.image2
                 self.rect.y = screen_height - self.rect.height - 100
             if not self.velocity >= 40:
-            self.velocity += 0.25
-
+                self.velocity += 0.25
         pantalla.blit(self.image, self.rect)
 
 estructure = Estructura1(x=100, width=50, height=50, velocity=5)
@@ -748,7 +753,6 @@ class Bg_juego1:
         for i, (image, speed) in enumerate(zip(self.bg_images, self.speeds)):
             for x in range(0, self.tiles):
                 position = (x * self.bg_width + self.scrolls[i], 0)
-
                 self.screen.blit(image, position)
 
                 # Actualiza el desplazamiento para cada capa.
@@ -756,7 +760,9 @@ class Bg_juego1:
 
                 if abs(self.scrolls[i]) > self.bg_width:
                     self.scrolls[i] = 0
-bg1 = Bg_juego1(pantalla, screen_width, screen_height)
+
+    def reset_scroll(self):
+        self.scrolls = [0] * len(self.speeds)
 
 class Bg_juego2:
     scrolls = 0
@@ -790,7 +796,6 @@ class Bg_juego2:
         for i, (image, speed) in enumerate(zip(self.bg_images, self.speeds)):
             for x in range(0, self.tiles):
                 position = (x * self.bg_width + self.scrolls[i], 0)
-
                 self.screen.blit(image, position)
 
                 # Actualiza el desplazamiento para cada capa.
@@ -798,7 +803,20 @@ class Bg_juego2:
 
                 if abs(self.scrolls[i]) > self.bg_width:
                     self.scrolls[i] = 0
+
+    def reset_scroll(self):
+        self.scrolls = [0] * len(self.speeds)
+
+bg1 = Bg_juego1(pantalla, screen_width, screen_height)
 bg2 = Bg_juego2(pantalla, screen_width, screen_height)
+
+current_bg = random.choice([bg1, bg2])
+
+def cambiar_fondo_aleatorio():
+    global current_bg
+    current_bg = random.choice([bg1, bg2])
+    current_bg.reset_scroll()
+    print(f"Fondo cambiado a: {current_bg}")
 
 def reiniciar_juego():
     global puntuacion, tiempo_ultimo_punto, juego_activo, menu_activo, scrolls
@@ -902,8 +920,7 @@ while run:
         elif jugador.rect.left < estructura_colisionada.rect.right:
             jugador.rect.left = estructura_colisionada.rect.right
 
-    bg1.draw_bg()
-
+    current_bg.draw_bg()
     jugador.draw(pantalla)
     estructura1.draw(pantalla)
     enemigos.draw(pantalla)
