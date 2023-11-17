@@ -187,7 +187,7 @@ def mostrar_menu():
     jugador.vida = 3
 
     # Restablece la posición de las estructuras
-    estructuras.empty()
+    estructura1.empty()
     enemigos.empty()
     
     numero_enemigo = random.randint(1, 3)  # Elegir un número aleatorio entre 1 y 3
@@ -204,9 +204,8 @@ def mostrar_menu():
     enemigos.add(nuevo_enemigo)
 
     for _ in range(1):
-        nueva_estructura = Estructura(random.randint(screen_width, screen_width + 200), 50, 120, 10)
-        estructuras.add(nueva_estructura)
-
+            nueva_estructura = Estructura1(random.randint(screen_width, screen_width + 200), 50, 120, 10)
+            estructura1.add(nueva_estructura)
 
     while menu_activo:
         for event in pygame.event.get():
@@ -621,26 +620,48 @@ def actualizar_puntuacion():
     puntuacion_rect.topright = (screen_width - 10, 10)
     pantalla.blit(puntuacion_texto, puntuacion_rect.topleft)
 
-sprite_caja2 = pygame.image.load("proyecto/sprites/structuras/structure1(small).png").convert_alpha()
-class Estructura(pygame.sprite.Sprite):
+
+sprite_caja1 = pygame.image.load("proyecto/sprites/structuras/cajas-a.png").convert_alpha()
+sprite_caja2 = pygame.image.load("proyecto/sprites/structuras/cajas-p.png").convert_alpha()
+class Estructura1(pygame.sprite.Sprite):
     def __init__(self, x, width, height, velocity):
         super().__init__()
-        self.image = sprite_caja2
-        self.rect = pygame.Rect(x, 0, width, height)  
+        self.image1 = pygame.image.load("proyecto/sprites/structuras/cajas-a.png").convert_alpha()  # Cambia "ruta_de_tu_textura.jpg" con la ruta de tu textura
+        self.image1 = pygame.transform.scale(self.image1, (width, height))
+        self.image2 = pygame.image.load("proyecto/sprites/structuras/cajas-p.png").convert_alpha()  # Cambia "ruta_de_tu_textura.jpg" con la ruta de tu textura
+        self.image2 = pygame.transform.scale(self.image2, (width, height))
+        self.image = self.image1
+        self.rect = self.image.get_rect(topleft=(x, 0))
         self.velocity = velocity
-    
+        self.structure_sel = None
+
     def update(self):
+        global screen_width
+        screen_width = pantalla.get_width()
         self.rect.x -= self.velocity
         if self.rect.right < 0:
             self.rect.x = screen_width + 200
-            stucture_sel = random.randint(1, 2)
-            if stucture_sel==1:
-                self.rect.y = screen_height- self.rect.height - 100
-            elif stucture_sel==2:
+            self.structure_sel = random.randint(1, 3)
+            if self.structure_sel == 1:
+                if self.image == self.image2:
+                    self.image = self.image1
+                self.rect.y = screen_height - self.rect.height - 100
+            elif self.structure_sel == 2:
+                if self.image == self.image2:
+                    self.image = self.image1
                 self.rect.y = 720 - self.rect.height
-            self.velocity += 0.25
+            elif self.structure_sel == 3:
+                if self.image == self.image1:
+                    self.image = self.image2
+                self.rect.y = screen_height - self.rect.height - 100
+            if not self.velocity >= 40:
+                self.velocity += 0.25
 
-estructuras = pygame.sprite.Group()
+        pantalla.blit(self.image, self.rect)
+
+estructure = Estructura1(x=100, width=50, height=50, velocity=5)
+
+estructura1 = pygame.sprite.Group()    
 
 font = pygame.font.Font(None, 36)
 corazon_image = pygame.image.load("proyecto/sprites/cora.png")
@@ -815,7 +836,7 @@ while run:
                     jugador.levantarse()
 
     jugador.update()
-    estructuras.update()
+    estructura1.update()
     # Actualiza la posición de los enemigos
     for enemigo in enemigos.sprites():
         enemigo.update()
@@ -857,8 +878,6 @@ while run:
                     print("¡Enemigo derrotado!")
                     generar_enemigo()
 
-
-
     if jugador.rect.right < 0:
         print("¡Juego terminado! Se salió de la pantalla.")
         mostrar_mensaje_muerte(surface)
@@ -873,20 +892,20 @@ while run:
         menu_activo = True
         reiniciar_juego()
 
-    choque = pygame.sprite.spritecollide(jugador, estructuras, False)
+    choque = pygame.sprite.spritecollide(jugador, estructura1, False)
     if choque:
         estructura_colisionada = choque[0]
-        if jugador.rect.right > estructura_colisionada.rect.left:
+        if estructura_colisionada.structure_sel == 3:
+            jugador.vida -= 3
+        elif jugador.rect.right > estructura_colisionada.rect.left:
             jugador.rect.right = estructura_colisionada.rect.left
         elif jugador.rect.left < estructura_colisionada.rect.right:
             jugador.rect.left = estructura_colisionada.rect.right
 
     bg1.draw_bg()
 
-    for estructura in estructuras:
-        pygame.draw.rect(pantalla, MARRON, estructura.rect)
-
     jugador.draw(pantalla)
+    estructura1.draw(pantalla)
     enemigos.draw(pantalla)
 
     mostrar_vida(pantalla, jugador.vida)
