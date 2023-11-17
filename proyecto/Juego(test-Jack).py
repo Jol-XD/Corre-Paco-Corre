@@ -42,11 +42,10 @@ def salir_del_juego():
     pygame.quit()
     sys.exit()
 
-
 #Titulo
-titulo = pygame.image.load('proyecto/sprites/titulos/nombre13.png').convert_alpha()
+titulo = pygame.image.load('proyecto/sprites/titulos/nombre18.png').convert_alpha()
 titulo= pygame.transform.scale(titulo, (500, 400))
-titulo2 = pygame.image.load('proyecto/sprites/titulos/nombre12.png').convert_alpha()
+titulo2 = pygame.image.load('proyecto/sprites/titulos/nombre20.png').convert_alpha()
 titulo2= pygame.transform.scale(titulo2, (500, 400))
 
 # Carga de imágenes para los botones
@@ -54,11 +53,14 @@ jugar_img = pygame.image.load('proyecto/sprites/botones/JUGAR1.png').convert_alp
 jugar_presionado_img = pygame.image.load('proyecto/sprites/botones/jugar02.png').convert_alpha()
 salir_img = pygame.image.load('proyecto/sprites/botones/SALIR1.png').convert_alpha()
 salir_presionado_img = pygame.image.load('proyecto/sprites/botones/salir002.png').convert_alpha()
+salir_img2 = pygame.image.load('proyecto/sprites/botones/salirnoche.png').convert_alpha()
+salir_presionado_img2 = pygame.image.load('proyecto/sprites/botones/salirnoche0.png').convert_alpha()
 No_img = pygame.image.load('proyecto/sprites/botones/no.png').convert_alpha()
 Si_img = pygame.image.load('proyecto/sprites/botones/si.png').convert_alpha()
 
 jugar_btn = Boton(445, 540, jugar_img, 5.25)
 salir_btn = Boton(446, 670, salir_img, 5.25)
+salir_btn2 = Boton(446, 670, salir_img2, 5.25)
 yes_btn = Boton(350, 400, Si_img, 5.25)
 no_btn = Boton(675, 400, No_img, 5.25)
 
@@ -215,8 +217,10 @@ def mostrar_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if jugar_btn.rect.collidepoint(event.pos):
                     jugar_btn.clicked = True
+                    jugar_btn.image = pygame.transform.scale(jugar_presionado_img, (int(jugar_presionado_img.get_width() * 5.25), int(jugar_presionado_img.get_height() * 5.25)))
                 if salir_btn.rect.collidepoint(event.pos):
                     salir_btn.clicked = True
+                    salir_btn.image = pygame.transform.scale(salir_presionado_img, (int(salir_presionado_img.get_width() * 5.25), int(salir_presionado_img.get_height() * 5.25)))
 
             if event.type == pygame.MOUSEBUTTONUP:
                 if jugar_btn.clicked:
@@ -224,24 +228,21 @@ def mostrar_menu():
                     juego_activo = True
                     jugar_btn.clicked = False
                     cambiar_fondo_aleatorio()
+                    jugar_btn.image = pygame.transform.scale(jugar_img, (int(jugar_img.get_width() * 5.25), int(jugar_img.get_height() * 5.25)))
                 if salir_btn.clicked:
                     salir_btn.clicked = False
                     if mostrar_mensaje_salida():
                         run = False
+                        salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
 
-
-        if jugar_btn.clicked:
-            jugar_btn.image = pygame.transform.scale(jugar_img, (int(jugar_img.get_width() * 5.25), int(jugar_img.get_height() * 5.25)))
-        else:
-            jugar_btn.image = pygame.transform.scale(jugar_img, (int(jugar_img.get_width() * 5.25), int(jugar_img.get_height() * 5.25)))
-
-        if salir_btn.clicked:
-            salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
-        else:
-            salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
-        
-
-
+            if event.type == pygame.MOUSEMOTION:
+                # Restablecer el estado del botón si el mouse se mueve fuera del botón
+                if not salir_btn.rect.collidepoint(event.pos):
+                    salir_btn.clicked = False
+                    salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
+                if not jugar_btn.rect.collidepoint(event.pos):
+                    jugar_btn.clicked = False
+                    jugar_btn.image = pygame.transform.scale(jugar_img, (int(jugar_img.get_width() * 5.25), int(jugar_img.get_height() * 5.25)))
         bg_m1.draw_bg()
         pantalla.blit(titulo, (350, 50))
         jugar_btn.draw()
@@ -253,7 +254,6 @@ def mostrar_menu_pausa():
 
     pausa = True
 
-
     while pausa:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -261,33 +261,29 @@ def mostrar_menu_pausa():
                 sys.exit()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if salir_btn.rect.collidepoint(event.pos):
-                    salir_btn.clicked = True
+                if salir_btn2.rect.collidepoint(event.pos):
+                    salir_btn2.clicked = True
+                    salir_btn2.image = pygame.transform.scale(salir_presionado_img2, (int(salir_presionado_img2.get_width() * 5.25), int(salir_presionado_img2.get_height() * 5.25)))
 
             if event.type == pygame.MOUSEBUTTONUP:
-                if salir_btn.clicked:
-                    salir_btn.clicked = False
+                if salir_btn2.clicked:
+                    salir_btn2.clicked = False
                     if mostrar_mensaje_salida():
                         run = False
+                    salir_btn2.image = pygame.transform.scale(salir_img2, (int(salir_img2.get_width() * 5.25), int(salir_img2.get_height() * 5.25)))
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     pausa = False
 
-        if salir_btn.clicked:
-            salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
-        else:
-            salir_btn.image = pygame.transform.scale(salir_img, (int(salir_img.get_width() * 5.25), int(salir_img.get_height() * 5.25)))
-
-
         bg_m2.draw_bg()
         pantalla.blit(titulo2, (350, 50))
-        salir_btn.draw()
+        salir_btn2.draw()  # Aquí debes usar salir_btn2 en lugar de salir_btn
         mensaje = "Pulsa Esc para renudar"
         font = pygame.font.SysFont("arialblack", 50)
         draw_text(mensaje, font, (255, 255, 255), 410, 600)
-    
-        pygame.display.flip()
+        pygame.display.update()
+
 
 pausa = False
 
@@ -409,7 +405,6 @@ class Jugador(pygame.sprite.Sprite):
             self.is_agachado = False
             self.rect.height = 80
             self.rect.y -= 0
-            self.restablecer_animacion()
 
     def atacar(self):
         if not self.is_atacando:
@@ -422,7 +417,6 @@ class Jugador(pygame.sprite.Sprite):
 
     def detener_ataque(self):
         self.is_atacando = False
-        self.restablecer_animacion()
         self.attack = None  # Limpiar la instancia de ataque
 
     def draw(self, surface):
