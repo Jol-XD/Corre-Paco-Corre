@@ -90,9 +90,7 @@ def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
     pantalla.blit(img, (x, y))
 
-
 #Background
-
 # Definir las velocidades para cada capa.
 class Bg_menu1:
     def __init__(self, screen, screen_width, screen_height):
@@ -176,7 +174,7 @@ bg_m2 = Bg_menu2(pantalla, screen_width, screen_height)
 
 # Función para mostrar el menú principal
 def mostrar_menu():
-    global menu_activo, juego_activo, puntuacion, tiempo_ultimo_punto, scroll
+    global menu_activo, juego_activo, puntuacion, tiempo_ultimo_punto
 
     menu_activo = True
     juego_activo = False
@@ -293,7 +291,6 @@ def mostrar_menu_pausa():
 
 pausa = False
 
-
 class Jugador(pygame.sprite.Sprite):
     def __init__(self, x, y, velocity_x, velocity_y):
         self.velocity = [velocity_x, velocity_y]
@@ -320,6 +317,12 @@ class Jugador(pygame.sprite.Sprite):
             frame = pygame.transform.scale(frame, (50, 100))
             self.animacion_salto.append(frame)
 
+        self.animacion_agacharse = []
+        for i in range(1, 9):
+            frame = pygame.image.load(os.path.join("proyecto", "sprites", "agachar", f"seagacha{i}.png"))
+            frame = pygame.transform.scale(frame, (40, 45))
+            self.animacion_agacharse.append(frame)
+
         self.indice_animacion = 0
         self.image = self.animacion[self.indice_animacion]
 
@@ -327,9 +330,6 @@ class Jugador(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.tiempo_animacion = 100
-
-        self.image_crouch = pygame.image.load("proyecto/sprites/palo_agacha.png")
-        self.image_crouch = pygame.transform.scale(self.image_crouch, (40, 40))
 
         self.attack_rect = None
         
@@ -369,11 +369,23 @@ class Jugador(pygame.sprite.Sprite):
                     self.image = self.animacion[self.indice_animacion]
                     self.ultimo_cambio = tiempo_actual
 
-        if self.is_jumping:
+        if self.is_agachado:
+            tiempo_actual = pygame.time.get_ticks()
+            if tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
+                self.indice_animacion = (self.indice_animacion + 1) % len(self.animacion_agacharse)
+                self.image = self.animacion_agacharse[self.indice_animacion]
+                self.ultimo_cambio = tiempo_actual
+        elif self.is_jumping:
             tiempo_actual = pygame.time.get_ticks()
             if tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
                 self.indice_animacion = (self.indice_animacion + 1) % len(self.animacion_salto)
                 self.image = self.animacion_salto[self.indice_animacion]
+                self.ultimo_cambio = tiempo_actual
+        else:
+            tiempo_actual = pygame.time.get_ticks()
+            if tiempo_actual - self.ultimo_cambio > self.tiempo_animacion:
+                self.indice_animacion = (self.indice_animacion + 1) % len(self.animacion)
+                self.image = self.animacion[self.indice_animacion]
                 self.ultimo_cambio = tiempo_actual
 
     def restablecer_animacion(self):
@@ -388,7 +400,7 @@ class Jugador(pygame.sprite.Sprite):
     def agacharse(self):
         if not self.is_agachado and (not self.is_jumping or (self.is_jumping and 650 <= self.rect.y <= 700)):
             self.is_agachado = True
-            self.image = self.image_crouch
+            self.image = self.animacion_agacharse[0]
             self.rect.height = 40
             self.rect.y += 0
 
@@ -396,7 +408,8 @@ class Jugador(pygame.sprite.Sprite):
         if self.is_agachado:
             self.is_agachado = False
             self.rect.height = 80
-            self.rect.y -= 0 
+            self.rect.y -= 0
+            self.restablecer_animacion()
 
     def atacar(self):
         if not self.is_atacando:
@@ -462,9 +475,6 @@ class EnemigoNormal(pygame.sprite.Sprite):
 
         self.rect.x += self.velocity_x
 
-        if self.rect.right < 0 or self.derrotado:
-            self.reiniciar()
-
     def reiniciar(self):
         self.rect.x = screen_width
         self.rect.y = 700
@@ -507,9 +517,6 @@ class EnemigoVolador(pygame.sprite.Sprite):
             self.ultimo_cambio = tiempo_actual
 
         self.rect.x += self.velocity_x
-
-        if self.rect.right < 0 or self.derrotado:
-            self.reiniciar()
 
     def reiniciar(self):
         self.rect.x = screen_width
@@ -554,9 +561,6 @@ class EnemigoEnano(pygame.sprite.Sprite):
 
         self.rect.x += self.velocity_x
 
-        if self.rect.right < 0 or self.derrotado:
-            self.reiniciar()
-
     def reiniciar(self):
         self.rect.x = screen_width
         self.rect.y = 740
@@ -581,11 +585,11 @@ def generar_enemigo():
         tipo_enemigo = EnemigoNormal
     elif numero_enemigo == 2:
         tipo_enemigo = EnemigoVolador
-    if numero_enemigo == 4:
+    elif numero_enemigo == 4:
         tipo_enemigo = EnemigoNormal
     elif numero_enemigo == 5:
         tipo_enemigo = EnemigoVolador
-    if numero_enemigo == 7:
+    elif numero_enemigo == 7:
         tipo_enemigo = EnemigoNormal
     elif numero_enemigo == 8:
         tipo_enemigo = EnemigoVolador
@@ -706,12 +710,13 @@ class Bg_juego1:
         self.bg_images = []
         for i in range(1, 4):
             bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_juego", "Ocean_1", f"{i}.png")).convert_alpha()
-
+            # Calculate the corresponding width to maintain the aspect ratio
             aspect_ratio = bg_image.get_width() / bg_image.get_height()
             bg_width = int(self.screen_height * aspect_ratio)
-
+            
+            # Resize the image to the calculated width and screen_height
             bg_image = pygame.transform.scale(bg_image, (bg_width, self.screen_height))
-
+            
             self.bg_images.append(bg_image)
 
         self.bg_width = self.bg_images[0].get_width()
@@ -719,9 +724,10 @@ class Bg_juego1:
         self.tiles = math.ceil(self.screen_width / self.bg_width) + 1
 
     def draw_bg(self):
-        for x in range(0, self.tiles):
-            for i, (image, speed) in enumerate(zip(self.bg_images, self.speeds)):
+        for i, (image, speed) in enumerate(zip(self.bg_images, self.speeds)):
+            for x in range(0, self.tiles):
                 position = (x * self.bg_width + self.scrolls[i], 0)
+
                 self.screen.blit(image, position)
 
                 # Actualiza el desplazamiento para cada capa.
@@ -729,22 +735,59 @@ class Bg_juego1:
 
                 if abs(self.scrolls[i]) > self.bg_width:
                     self.scrolls[i] = 0
-
-
 bg1 = Bg_juego1(pantalla, screen_width, screen_height)
 
-def reiniciar_juego():
-    global puntuacion
-    global tiempo_ultimo_punto
-    global juego_activo
-    global menu_activo
+class Bg_juego2:
+    scrolls = 0
+    def __init__(self, screen, screen_width, screen_height):
+        self.screen = screen
+        self.screen_width = screen_width
+        self.screen_height = screen_height
 
+        self.bg_speed = 1  # Velocidad adicional para el fondo
+
+        self.speeds = [0.25, 0.35, 0.55, 0.55, 0.57]
+        self.scrolls = [0] * len(self.speeds)
+
+        self.bg_images = []
+        for i in range(1, 6):
+            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_juego", "Ocean_7", f"{i}.png")).convert_alpha()
+            # Calculate the corresponding width to maintain the aspect ratio
+            aspect_ratio = bg_image.get_width() / bg_image.get_height()
+            bg_width = int(self.screen_height * aspect_ratio)
+            
+            # Resize the image to the calculated width and screen_height
+            bg_image = pygame.transform.scale(bg_image, (bg_width, self.screen_height))
+            
+            self.bg_images.append(bg_image)
+
+        self.bg_width = self.bg_images[0].get_width()
+
+        self.tiles = math.ceil(self.screen_width / self.bg_width) + 1
+
+    def draw_bg(self):
+        for i, (image, speed) in enumerate(zip(self.bg_images, self.speeds)):
+            for x in range(0, self.tiles):
+                position = (x * self.bg_width + self.scrolls[i], 0)
+
+                self.screen.blit(image, position)
+
+                # Actualiza el desplazamiento para cada capa.
+                self.scrolls[i] -= speed
+
+                if abs(self.scrolls[i]) > self.bg_width:
+                    self.scrolls[i] = 0
+bg2 = Bg_juego2(pantalla, screen_width, screen_height)
+
+def reiniciar_juego():
+    global puntuacion, tiempo_ultimo_punto, juego_activo, menu_activo, scrolls
     # Reinicia las variables globales
     puntuacion = 0
     tiempo_ultimo_punto = pygame.time.get_ticks()
     juego_activo = False
     menu_activo = True
-    
+    scrolls = 0
+
     # Elimina todos los enemigos
     enemigos.empty()
 
@@ -772,8 +815,23 @@ while run:
                     jugador.levantarse()
 
     jugador.update()
-    enemigos.update()
     estructuras.update()
+    # Actualiza la posición de los enemigos
+    for enemigo in enemigos.sprites():
+        enemigo.update()
+
+        # Verifica si el enemigo está fuera de la pantalla (lado derecho o izquierdo)
+        if enemigo.rect.right < 0 or enemigo.rect.left > screen_width:
+            enemigo.derrotado = True
+            enemigos_derrotados.append(enemigo)
+            print("¡Enemigo salió de la pantalla!")
+            generar_enemigo()
+
+    # Elimina los enemigos derrotados del grupo de enemigos
+    for enemigo in enemigos_derrotados:
+        enemigos.remove(enemigo)
+
+    enemigos_derrotados = []
 
     # Colisiones y lógica del juego
     colisiones_jugador_enemigos = pygame.sprite.spritecollide(jugador, enemigos, False)
@@ -788,10 +846,6 @@ while run:
                     print("¡Enemigo derrotado!")
                     generar_enemigo()
 
-        # Elimina los enemigos derrotados del grupo de enemigos
-        for enemigo in enemigos_derrotados:
-            enemigos.remove(enemigo)
-
     # Colisiones del ataque del jugador con los enemigos
     if jugador.is_atacando and jugador.attack:
         colisiones_ataque_enemigos = pygame.sprite.spritecollide(jugador.attack, enemigos, False)
@@ -803,11 +857,7 @@ while run:
                     print("¡Enemigo derrotado!")
                     generar_enemigo()
 
-            # Elimina los enemigos derrotados del grupo de enemigos
-            for enemigo in enemigos_derrotados:
-                enemigos.remove(enemigo)
 
-        enemigos_derrotados = [] 
 
     if jugador.rect.right < 0:
         print("¡Juego terminado! Se salió de la pantalla.")
