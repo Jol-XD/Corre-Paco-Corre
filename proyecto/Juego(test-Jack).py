@@ -475,9 +475,6 @@ class EnemigoNormal(pygame.sprite.Sprite):
 
         self.rect.x += self.velocity_x
 
-        if self.rect.right < 0 or self.derrotado:
-            self.reiniciar()
-
     def reiniciar(self):
         self.rect.x = screen_width
         self.rect.y = 700
@@ -521,9 +518,6 @@ class EnemigoVolador(pygame.sprite.Sprite):
 
         self.rect.x += self.velocity_x
 
-        if self.rect.right < 0 or self.derrotado:
-            self.reiniciar()
-
     def reiniciar(self):
         self.rect.x = screen_width
         self.rect.y = 680
@@ -566,9 +560,6 @@ class EnemigoEnano(pygame.sprite.Sprite):
             self.ultimo_cambio = tiempo_actual
 
         self.rect.x += self.velocity_x
-
-        if self.rect.right < 0 or self.derrotado:
-            self.reiniciar()
 
     def reiniciar(self):
         self.rect.x = screen_width
@@ -824,8 +815,23 @@ while run:
                     jugador.levantarse()
 
     jugador.update()
-    enemigos.update()
     estructuras.update()
+    # Actualiza la posición de los enemigos
+    for enemigo in enemigos.sprites():
+        enemigo.update()
+
+        # Verifica si el enemigo está fuera de la pantalla (lado derecho o izquierdo)
+        if enemigo.rect.right < 0 or enemigo.rect.left > screen_width:
+            enemigo.derrotado = True
+            enemigos_derrotados.append(enemigo)
+            print("¡Enemigo salió de la pantalla!")
+            generar_enemigo()
+
+    # Elimina los enemigos derrotados del grupo de enemigos
+    for enemigo in enemigos_derrotados:
+        enemigos.remove(enemigo)
+
+    enemigos_derrotados = []
 
     # Colisiones y lógica del juego
     colisiones_jugador_enemigos = pygame.sprite.spritecollide(jugador, enemigos, False)
@@ -840,11 +846,6 @@ while run:
                     print("¡Enemigo derrotado!")
                     generar_enemigo()
 
-
-        # Elimina los enemigos derrotados del grupo de enemigos
-        for enemigo in enemigos_derrotados:
-            enemigos.remove(enemigo)
-
     # Colisiones del ataque del jugador con los enemigos
     if jugador.is_atacando and jugador.attack:
         colisiones_ataque_enemigos = pygame.sprite.spritecollide(jugador.attack, enemigos, False)
@@ -856,11 +857,7 @@ while run:
                     print("¡Enemigo derrotado!")
                     generar_enemigo()
 
-            # Elimina los enemigos derrotados del grupo de enemigos
-            for enemigo in enemigos_derrotados:
-                enemigos.remove(enemigo)
 
-        enemigos_derrotados = [] 
 
     if jugador.rect.right < 0:
         print("¡Juego terminado! Se salió de la pantalla.")
