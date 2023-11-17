@@ -807,14 +807,233 @@ class Bg_juego2:
     def reset_scroll(self):
         self.scrolls = [0] * len(self.speeds)
 
+class Bg_juego3:
+    scrolls = 0
+    def __init__(self, screen, screen_width, screen_height):
+        self.screen = screen
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+
+        self.bg_speed = 1  # Velocidad adicional para el fondo
+
+        self.speeds = [0.25, 0.35, 0.55, 0.58, 0.61]
+        self.scrolls = [0] * len(self.speeds)
+
+        self.bg_images = []
+        for i in range(1, 6):
+            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_juego", "Ocean_8", f"{i}.png")).convert_alpha()
+            # Calculate the corresponding width to maintain the aspect ratio
+            aspect_ratio = bg_image.get_width() / bg_image.get_height()
+            bg_width = int(self.screen_height * aspect_ratio)
+            
+            # Resize the image to the calculated width and screen_height
+            bg_image = pygame.transform.scale(bg_image, (bg_width, self.screen_height))
+            
+            self.bg_images.append(bg_image)
+
+        self.bg_width = self.bg_images[0].get_width()
+
+        self.tiles = math.ceil(self.screen_width / self.bg_width) + 1
+
+    def draw_bg(self):
+        for i, (image, speed) in enumerate(zip(self.bg_images, self.speeds)):
+            for x in range(0, self.tiles):
+                position = (x * self.bg_width + self.scrolls[i], 0)
+                self.screen.blit(image, position)
+
+                # Actualiza el desplazamiento para cada capa.
+                self.scrolls[i] -= speed
+
+                if abs(self.scrolls[i]) > self.bg_width:
+                    self.scrolls[i] = 0
+
+    def reset_scroll(self):
+        self.scrolls = [0] * len(self.speeds)
+
+class Bg_juego4:
+    scrolls = 0
+    def __init__(self, screen, screen_width, screen_height):
+        self.screen = screen
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+
+        self.bg_speed = 1  # Velocidad adicional para el fondo
+
+        self.speeds = [0.25, 0.35, 0.55, 0.55, 0.60]
+        self.scrolls = [0] * len(self.speeds)
+
+        self.bg_images = []
+        for i in range(1, 6):
+            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_juego", "Ocean_6", f"{i}.png")).convert_alpha()
+            # Calculate the corresponding width to maintain the aspect ratio
+            aspect_ratio = bg_image.get_width() / bg_image.get_height()
+            bg_width = int(self.screen_height * aspect_ratio)
+            
+            # Resize the image to the calculated width and screen_height
+            bg_image = pygame.transform.scale(bg_image, (bg_width, self.screen_height))
+            
+            self.bg_images.append(bg_image)
+
+        self.bg_width = self.bg_images[0].get_width()
+
+        self.tiles = math.ceil(self.screen_width / self.bg_width) + 1
+
+    def draw_bg(self):
+        for i, (image, speed) in enumerate(zip(self.bg_images, self.speeds)):
+            for x in range(0, self.tiles):
+                position = (x * self.bg_width + self.scrolls[i], 0)
+                self.screen.blit(image, position)
+
+                # Actualiza el desplazamiento para cada capa.
+                self.scrolls[i] -= speed
+
+                if abs(self.scrolls[i]) > self.bg_width:
+                    self.scrolls[i] = 0
+
+    def reset_scroll(self):
+        self.scrolls = [0] * len(self.speeds)
+
+class Bg_juego5:
+    scrolls = 0
+    def __init__(self, screen, screen_width, screen_height):
+        self.screen = screen
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+
+        self.bg_speed = 1  # Velocidad adicional para el fondo
+
+        self.speeds = [0.25, 0.35, 0.55, 0.60,]
+        self.scrolls = [0] * len(self.speeds)
+
+        self.bg_images = []
+        for i in range(1, 5):
+            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_juego", "Ocean_4", f"{i}.png")).convert_alpha()
+            # Calculate the corresponding width to maintain the aspect ratio
+            aspect_ratio = bg_image.get_width() / bg_image.get_height()
+            bg_width = int(self.screen_height * aspect_ratio)
+            
+            # Resize the image to the calculated width and screen_height
+            bg_image = pygame.transform.scale(bg_image, (bg_width, self.screen_height))
+            
+            self.bg_images.append(bg_image)
+
+        self.bg_width = self.bg_images[0].get_width()
+
+        self.tiles = math.ceil(self.screen_width / self.bg_width) + 1
+
+    def draw_bg(self):
+        for i, (image, speed) in enumerate(zip(self.bg_images, self.speeds)):
+            for x in range(0, self.tiles):
+                position = (x * self.bg_width + self.scrolls[i], 0)
+                self.screen.blit(image, position)
+
+                # Actualiza el desplazamiento para cada capa.
+                self.scrolls[i] -= speed
+
+                if abs(self.scrolls[i]) > self.bg_width:
+                    self.scrolls[i] = 0
+
+    def reset_scroll(self):
+        self.scrolls = [0] * len(self.speeds)
+
+class Bg_juego6:
+    scrolls = 0
+    def __init__(self, screen, screen_width, screen_height):
+        self.screen = screen
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+
+        self.bg_speed = 1  # Velocidad adicional para el fondo
+
+        self.speeds = [0.25, 0.35, 0.55, 0.60,]
+        self.scrolls = [0] * len(self.speeds)
+
+        self.bg_images = []
+        for i in range(1, 5):
+            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_juego", "Ocean_3", f"{i}.png")).convert_alpha()
+            # Calculate the corresponding width to maintain the aspect ratio
+            aspect_ratio = bg_image.get_width() / bg_image.get_height()
+            bg_width = int(self.screen_height * aspect_ratio)
+            
+            # Resize the image to the calculated width and screen_height
+            bg_image = pygame.transform.scale(bg_image, (bg_width, self.screen_height))
+            
+            self.bg_images.append(bg_image)
+
+        self.bg_width = self.bg_images[0].get_width()
+
+        self.tiles = math.ceil(self.screen_width / self.bg_width) + 1
+
+    def draw_bg(self):
+        for i, (image, speed) in enumerate(zip(self.bg_images, self.speeds)):
+            for x in range(0, self.tiles):
+                position = (x * self.bg_width + self.scrolls[i], 0)
+                self.screen.blit(image, position)
+
+                # Actualiza el desplazamiento para cada capa.
+                self.scrolls[i] -= speed
+
+                if abs(self.scrolls[i]) > self.bg_width:
+                    self.scrolls[i] = 0
+
+    def reset_scroll(self):
+        self.scrolls = [0] * len(self.speeds)
+
+class Bg_juego7:
+    scrolls = 0
+    def __init__(self, screen, screen_width, screen_height):
+        self.screen = screen
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+
+        self.bg_speed = 1  # Velocidad adicional para el fondo
+
+        self.speeds = [0.25, 0.35, 0.55, 0.58, 0.60]
+        self.scrolls = [0] * len(self.speeds)
+
+        self.bg_images = []
+        for i in range(1, 6):
+            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_juego", "Ocean_5", f"{i}.png")).convert_alpha()
+            # Calculate the corresponding width to maintain the aspect ratio
+            aspect_ratio = bg_image.get_width() / bg_image.get_height()
+            bg_width = int(self.screen_height * aspect_ratio)
+            
+            # Resize the image to the calculated width and screen_height
+            bg_image = pygame.transform.scale(bg_image, (bg_width, self.screen_height))
+            
+            self.bg_images.append(bg_image)
+
+        self.bg_width = self.bg_images[0].get_width()
+
+        self.tiles = math.ceil(self.screen_width / self.bg_width) + 1
+
+    def draw_bg(self):
+        for i, (image, speed) in enumerate(zip(self.bg_images, self.speeds)):
+            for x in range(0, self.tiles):
+                position = (x * self.bg_width + self.scrolls[i], 0)
+                self.screen.blit(image, position)
+
+                # Actualiza el desplazamiento para cada capa.
+                self.scrolls[i] -= speed
+
+                if abs(self.scrolls[i]) > self.bg_width:
+                    self.scrolls[i] = 0
+
+    def reset_scroll(self):
+        self.scrolls = [0] * len(self.speeds)
+
 bg1 = Bg_juego1(pantalla, screen_width, screen_height)
 bg2 = Bg_juego2(pantalla, screen_width, screen_height)
-
-current_bg = random.choice([bg1, bg2])
+bg3 = Bg_juego3(pantalla, screen_width, screen_height)
+bg4 = Bg_juego4(pantalla, screen_width, screen_height)
+bg5 = Bg_juego5(pantalla, screen_width, screen_height)
+bg6 = Bg_juego6(pantalla, screen_width, screen_height)
+bg7 = Bg_juego7(pantalla, screen_width, screen_height)
+current_bg = random.choice([bg1, bg2, bg3, bg4, bg5, bg6, bg7])
 
 def cambiar_fondo_aleatorio():
     global current_bg
-    current_bg = random.choice([bg1, bg2])
+    current_bg = random.choice([bg1, bg2, bg3, bg4, bg5, bg6, bg7])
     current_bg.reset_scroll()
     print(f"Fondo cambiado a: {current_bg}")
 
