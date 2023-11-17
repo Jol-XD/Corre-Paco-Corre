@@ -186,7 +186,7 @@ def mostrar_menu():
     jugador.rect.x = 320
     jugador.rect.y = 700
     jugador.velocity = [0, 0]
-    jugador.vida = 3
+    jugador.vida = 100
 
     # Restablece la posición de las estructuras
     estructura1.empty()
@@ -302,7 +302,7 @@ class Jugador(pygame.sprite.Sprite):
         self.is_atacando = False
         self.gravity = 1.1
         self.jump_strength = -20
-        self.vida = 3
+        self.vida = 100
         self.attack_duration = 200
         self.attack_timer = 250
         self.attack = None
@@ -650,34 +650,14 @@ class Estructura1(pygame.sprite.Sprite):
                 if self.image == self.image1:
                     self.image = self.image2
                 self.rect.y = screen_height - self.rect.height - 100
-            self.velocity += 0.25
+            if not self.velocity >= 40:
+                self.velocity += 0.25
 
         pantalla.blit(self.image, self.rect)
 
 estructure = Estructura1(x=100, width=50, height=50, velocity=5)
 
-estructura1 = pygame.sprite.Group()
-
-#class Estructura2(pygame.sprite.Sprite):
-#    def __init__(self, x, width, height, velocity):
-#        super().__init__()
-#        self.image = pygame.image.load("proyecto/sprites/structuras/cajas-p.png").convert_alpha()  # Cambia "ruta_de_tu_textura.jpg" con la ruta de tu textura
-#        self.image = pygame.transform.scale(self.image, (width, height))
-#        self.rect = self.image.get_rect(topleft=(x, 0))
-#        self.velocity = velocity
-#
-#    def update(self):
-#        global screen_width
-#        screen_width = pantalla.get_width()
-#        self.rect.x -= self.velocity
-#        if self.rect.right < 0:
-#            self.rect.x = screen_width + 200
-#            self.rect.y = screen_height - self.rect.height - 100
-#            
-#            self.velocity += 0.25
-#
-#        pantalla.blit(self.image, self.rect)
-        
+estructura1 = pygame.sprite.Group()        
 
 font = pygame.font.Font(None, 36)
 corazon_image = pygame.image.load("proyecto/sprites/cora.png")
