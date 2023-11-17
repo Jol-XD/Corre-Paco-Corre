@@ -594,6 +594,7 @@ def generar_enemigo():
         tipo_enemigo = EnemigoVolador
     else:
         tipo_enemigo = EnemigoEnano
+        #si ahun no se ha alcanzado la velocidad maxima de los enemigos la augmenta 
     if not vel_enemigos >= 45:
         vel_enemigos -= 0.5
     nuevo_enemigo = tipo_enemigo(screen_width, 700)
