@@ -44,20 +44,20 @@ def salir_del_juego():
 
 
 #Titulo
-titulo = pygame.image.load('proyecto/sprites/titulos/nombre18.png').convert_alpha()
+titulo = pygame.image.load('sprites/titulos/nombre18.png').convert_alpha()
 titulo= pygame.transform.scale(titulo, (500, 400))
-titulo2 = pygame.image.load('proyecto/sprites/titulos/nombre20.png').convert_alpha()
+titulo2 = pygame.image.load('sprites/titulos/nombre20.png').convert_alpha()
 titulo2= pygame.transform.scale(titulo2, (500, 400))
 
 # Carga de imágenes para los botones
-jugar_img = pygame.image.load('proyecto/sprites/botones/JUGAR1.png').convert_alpha()
-jugar_presionado_img = pygame.image.load('proyecto/sprites/botones/jugar02.png').convert_alpha()
-salir_img = pygame.image.load('proyecto/sprites/botones/SALIR1.png').convert_alpha()
-salir_presionado_img = pygame.image.load('proyecto/sprites/botones/salir002.png').convert_alpha()
-salir_img2 = pygame.image.load('proyecto/sprites/botones/salirnoche.png').convert_alpha()
-salir_presionado_img2 = pygame.image.load('proyecto/sprites/botones/salirnoche0.png').convert_alpha()
-No_img = pygame.image.load('proyecto/sprites/botones/no.png').convert_alpha()
-Si_img = pygame.image.load('proyecto/sprites/botones/si.png').convert_alpha()
+jugar_img = pygame.image.load('sprites/botones/JUGAR1.png').convert_alpha()
+jugar_presionado_img = pygame.image.load('sprites/botones/jugar02.png').convert_alpha()
+salir_img = pygame.image.load('sprites/botones/SALIR1.png').convert_alpha()
+salir_presionado_img = pygame.image.load('sprites/botones/salir002.png').convert_alpha()
+salir_img2 = pygame.image.load('sprites/botones/salirnoche.png').convert_alpha()
+salir_presionado_img2 = pygame.image.load('sprites/botones/salirnoche0.png').convert_alpha()
+No_img = pygame.image.load('sprites/botones/no.png').convert_alpha()
+Si_img = pygame.image.load('sprites/botones/si.png').convert_alpha()
 
 jugar_btn = Boton(445, 540, jugar_img, 5.25)
 salir_btn = Boton(446, 670, salir_img, 5.25)
@@ -106,7 +106,7 @@ class Bg_menu1:
 
         self.bg_images = []
         for i in range(1, 5):
-            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_menu", "Clouds 5", f"{i}.png")).convert_alpha()
+            bg_image = pygame.image.load(os.path.join( "sprites", "bg_menu", "Clouds 5", f"{i}.png")).convert_alpha()
             
             # Calculate the corresponding width to maintain the aspect ratio
             aspect_ratio = bg_image.get_width() / bg_image.get_height()
@@ -146,7 +146,7 @@ class Bg_menu2:
 
         self.bg_images = []
         for i in range(1, 4):
-            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_menu", "Clouds 3", f"{i}.png")).convert_alpha()
+            bg_image = pygame.image.load(os.path.join( "sprites", "bg_menu", "Clouds 3", f"{i}.png")).convert_alpha()
             
             # Calculate the corresponding width to maintain the aspect ratio
             aspect_ratio = bg_image.get_width() / bg_image.get_height()
@@ -312,19 +312,19 @@ class Jugador(pygame.sprite.Sprite):
 
         self.animacion = []
         for i in range(1, 7):
-            frame = pygame.image.load(os.path.join("proyecto", "sprites", "corre", f"corre{i}.PNG"))
+            frame = pygame.image.load(os.path.join( "sprites", "corre", f"corre{i}.PNG"))
             frame = pygame.transform.scale(frame, (75, 100))
             self.animacion.append(frame)
 
         self.animacion_salto = []
         for i in range(1, 7):
-            frame = pygame.image.load(os.path.join("proyecto", "sprites", "salto", f"salto{i}.png"))
+            frame = pygame.image.load(os.path.join( "sprites", "salto", f"salto{i}.png"))
             frame = pygame.transform.scale(frame, (50, 100))
             self.animacion_salto.append(frame)
 
         self.animacion_agacharse = []
         for i in range(1, 9):
-            frame = pygame.image.load(os.path.join("proyecto", "sprites", "agachar", f"seagacha{i}.png"))
+            frame = pygame.image.load(os.path.join( "sprites", "agachar", f"seagacha{i}.png"))
             frame = pygame.transform.scale(frame, (40, 45))
             self.animacion_agacharse.append(frame)
 
@@ -442,7 +442,7 @@ class Jugador(pygame.sprite.Sprite):
             # Restablecer la animación original de correr
             self.animacion = []
             for i in range(1, 7):
-                frame = pygame.image.load(os.path.join("proyecto", "sprites", "corre", f"corre{i}.PNG"))
+                frame = pygame.image.load(os.path.join( "sprites", "corre", f"corre{i}.PNG"))
                 frame = pygame.transform.scale(frame, (75, 100))
                 self.animacion.append(frame)
 
@@ -456,7 +456,7 @@ class Jugador(pygame.sprite.Sprite):
                 # Switch back to the running animation
                 self.animacion = []
                 for i in range(1, 7):
-                    frame = pygame.image.load(os.path.join("proyecto", "sprites", "corre", f"corre{i}.PNG"))
+                    frame = pygame.image.load(os.path.join( "sprites", "corre", f"corre{i}.PNG"))
                     frame = pygame.transform.scale(frame, (75, 100))
                     self.animacion.append(frame)
 
@@ -477,7 +477,7 @@ class Attack(pygame.sprite.Sprite):
         super().__init__()
 
         # Carga la imagen
-        original_image = pygame.image.load('proyecto/sprites/atack/atack.png')  # Ajusta la ruta de la imagen
+        original_image = pygame.image.load('sprites/atack/atack.png')  # Ajusta la ruta de la imagen
 
         # Escala la imagen al tamaño deseado
         self.image = pygame.transform.scale(original_image, (width, height))
@@ -498,7 +498,7 @@ class EnemigoNormal(pygame.sprite.Sprite):
 
         # Carga de la animación principal
         for i in range(2, 6):
-            frame = pygame.image.load(os.path.join("proyecto", "sprites", "esqueleto", "run", f"run_{i}.png"))
+            frame = pygame.image.load(os.path.join( "sprites", "esqueleto", "run", f"run_{i}.png"))
             frame = pygame.transform.scale(frame, (60, 80))
             self.animacion.append(frame)
 
@@ -541,7 +541,7 @@ class EnemigoVolador(pygame.sprite.Sprite):
 
         # Carga de la animación principal
         for i in range(1, 8):
-            frame = pygame.image.load(os.path.join("proyecto", "sprites", "vuela_ojo", f"vuelo_{i}.png"))
+            frame = pygame.image.load(os.path.join( "sprites", "vuela_ojo", f"vuelo_{i}.png"))
             frame = pygame.transform.scale(frame, (70, 60))
             self.animacion.append(frame)
 
@@ -584,7 +584,7 @@ class EnemigoEnano(pygame.sprite.Sprite):
 
         # Carga de la animación principal
         for i in range(1, 4):
-            frame = pygame.image.load(os.path.join("proyecto", "sprites", "goblin", f"run{i}.png"))
+            frame = pygame.image.load(os.path.join( "sprites", "goblin", f"run{i}.png"))
             frame = pygame.transform.scale(frame, (40, 40))
             self.animacion.append(frame)
 
@@ -675,14 +675,14 @@ def actualizar_puntuacion():
     pantalla.blit(puntuacion_texto, puntuacion_rect.topleft)
 
 
-sprite_caja1 = pygame.image.load("proyecto/sprites/structuras/cajas-a.png").convert_alpha()
-sprite_caja2 = pygame.image.load("proyecto/sprites/structuras/cajas-p.png").convert_alpha()
+sprite_caja1 = pygame.image.load("sprites/structuras/cajas-a.png").convert_alpha()
+sprite_caja2 = pygame.image.load("sprites/structuras/cajas-p.png").convert_alpha()
 class Estructura1(pygame.sprite.Sprite):
     def __init__(self, x, width, height, velocity):
         super().__init__()
-        self.image1 = pygame.image.load("proyecto/sprites/structuras/cajas-a.png").convert_alpha()  # Cambia "ruta_de_tu_textura.jpg" con la ruta de tu textura
+        self.image1 = pygame.image.load("sprites/structuras/cajas-a.png").convert_alpha()  # Cambia "ruta_de_tu_textura.jpg" con la ruta de tu textura
         self.image1 = pygame.transform.scale(self.image1, (width, height))
-        self.image2 = pygame.image.load("proyecto/sprites/structuras/cajas-p.png").convert_alpha()  # Cambia "ruta_de_tu_textura.jpg" con la ruta de tu textura
+        self.image2 = pygame.image.load("sprites/structuras/cajas-p.png").convert_alpha()  # Cambia "ruta_de_tu_textura.jpg" con la ruta de tu textura
         self.image2 = pygame.transform.scale(self.image2, (width, height))
         self.image = self.image1
         self.rect = self.image.get_rect(topleft=(x, 0))
@@ -717,7 +717,7 @@ estructure = Estructura1(x=100, width=50, height=50, velocity=5)
 estructura1 = pygame.sprite.Group()    
 
 font = pygame.font.Font(None, 36)
-corazon_image = pygame.image.load("proyecto/sprites/cora.png")
+corazon_image = pygame.image.load("sprites/cora.png")
 corazon_image = pygame.transform.scale(corazon_image, (30, 30))
 
 # Función para mostrar la vida del jugador
@@ -732,7 +732,7 @@ def mostrar_vida(surface, vida):
         surface.blit(corazon_image, (x_corazon, y_corazon))
         x_corazon += 35
 
-has_muerto_image = pygame.image.load("proyecto/sprites/titulos/has_muerto.png")
+has_muerto_image = pygame.image.load("sprites/titulos/has_muerto.png")
 has_muerto_image = pygame.transform.scale(has_muerto_image, (500, 300))
 
 muerto = False
@@ -783,7 +783,7 @@ class Bg_juego1:
 
         self.bg_images = []
         for i in range(1, 4):
-            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_juego", "Ocean_1", f"{i}.png")).convert_alpha()
+            bg_image = pygame.image.load(os.path.join( "sprites", "bg_juego", "Ocean_1", f"{i}.png")).convert_alpha()
             # Calculate the corresponding width to maintain the aspect ratio
             aspect_ratio = bg_image.get_width() / bg_image.get_height()
             bg_width = int(self.screen_height * aspect_ratio)
@@ -826,7 +826,7 @@ class Bg_juego2:
 
         self.bg_images = []
         for i in range(1, 6):
-            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_juego", "Ocean_7", f"{i}.png")).convert_alpha()
+            bg_image = pygame.image.load(os.path.join( "sprites", "bg_juego", "Ocean_7", f"{i}.png")).convert_alpha()
             # Calculate the corresponding width to maintain the aspect ratio
             aspect_ratio = bg_image.get_width() / bg_image.get_height()
             bg_width = int(self.screen_height * aspect_ratio)
@@ -869,7 +869,7 @@ class Bg_juego3:
 
         self.bg_images = []
         for i in range(1, 6):
-            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_juego", "Ocean_8", f"{i}.png")).convert_alpha()
+            bg_image = pygame.image.load(os.path.join( "sprites", "bg_juego", "Ocean_8", f"{i}.png")).convert_alpha()
             # Calculate the corresponding width to maintain the aspect ratio
             aspect_ratio = bg_image.get_width() / bg_image.get_height()
             bg_width = int(self.screen_height * aspect_ratio)
@@ -912,7 +912,7 @@ class Bg_juego4:
 
         self.bg_images = []
         for i in range(1, 6):
-            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_juego", "Ocean_6", f"{i}.png")).convert_alpha()
+            bg_image = pygame.image.load(os.path.join( "sprites", "bg_juego", "Ocean_6", f"{i}.png")).convert_alpha()
             # Calculate the corresponding width to maintain the aspect ratio
             aspect_ratio = bg_image.get_width() / bg_image.get_height()
             bg_width = int(self.screen_height * aspect_ratio)
@@ -955,7 +955,7 @@ class Bg_juego5:
 
         self.bg_images = []
         for i in range(1, 5):
-            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_juego", "Ocean_4", f"{i}.png")).convert_alpha()
+            bg_image = pygame.image.load(os.path.join( "sprites", "bg_juego", "Ocean_4", f"{i}.png")).convert_alpha()
             # Calculate the corresponding width to maintain the aspect ratio
             aspect_ratio = bg_image.get_width() / bg_image.get_height()
             bg_width = int(self.screen_height * aspect_ratio)
@@ -998,7 +998,7 @@ class Bg_juego6:
 
         self.bg_images = []
         for i in range(1, 5):
-            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_juego", "Ocean_3", f"{i}.png")).convert_alpha()
+            bg_image = pygame.image.load(os.path.join( "sprites", "bg_juego", "Ocean_3", f"{i}.png")).convert_alpha()
             # Calculate the corresponding width to maintain the aspect ratio
             aspect_ratio = bg_image.get_width() / bg_image.get_height()
             bg_width = int(self.screen_height * aspect_ratio)
@@ -1041,7 +1041,7 @@ class Bg_juego7:
 
         self.bg_images = []
         for i in range(1, 6):
-            bg_image = pygame.image.load(os.path.join("proyecto", "sprites", "bg_juego", "Ocean_5", f"{i}.png")).convert_alpha()
+            bg_image = pygame.image.load(os.path.join( "sprites", "bg_juego", "Ocean_5", f"{i}.png")).convert_alpha()
             # Calculate the corresponding width to maintain the aspect ratio
             aspect_ratio = bg_image.get_width() / bg_image.get_height()
             bg_width = int(self.screen_height * aspect_ratio)
